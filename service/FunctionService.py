@@ -1,7 +1,10 @@
 class FunctionService:
     def sum(x, y):
-        print("Teste soma")
-        pass
+        if y == 0:
+            return x
+        else:
+            return next(sum(x, y - 1)) 
+
     def subtraction(self):
         pass
 
