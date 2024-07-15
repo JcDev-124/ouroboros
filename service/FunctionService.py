@@ -1,5 +1,5 @@
 class FunctionService:
-    def soma(self):
+    def soma(a, b):
         print("Teste soma")
         pass
     def subtraction(self):
@@ -25,3 +25,6 @@ class FunctionService:
 
     def module(self):
         pass
+    
+    def __next(x):
+        return x + 1
