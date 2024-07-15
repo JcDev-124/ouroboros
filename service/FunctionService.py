@@ -1,9 +1,10 @@
 class FunctionService:
+    @staticmethod
     def sum(x, y):
         if y == 0:
             return x
         else:
-            return next(sum(x, y - 1)) 
+            return FunctionService.__next(FunctionService.sum(x, (y - 1))) 
 
     def subtraction(self):
         pass
@@ -30,4 +31,4 @@ class FunctionService:
         pass
     
     def __next(x):
-        return x + 1
+        return (x + 1)

@@ -2,4 +2,4 @@ from service.FunctionService import FunctionService
 
 if __name__ == "__main__":
 
-    FunctionService.soma(self="")
+    print('Soma:', FunctionService.sum(5, 9))
