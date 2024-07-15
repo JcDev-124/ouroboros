@@ -1,5 +1,5 @@
 class FunctionService:
-    def soma(a, b):
+    def sum(x, y):
         print("Teste soma")
         pass
     def subtraction(self):
