@@ -9,8 +9,11 @@ class FunctionService:
     def subtraction(self):
         pass
 
-    def multiplication(self):
-        pass
+    def multiplication(x, y):
+        if y == 0:
+            return 0
+        else:
+            return FunctionService.sum(x, FunctionService.multiplication(x, (y - 1)))
 
     def potentiation(self):
         pass
