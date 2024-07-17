@@ -21,8 +21,11 @@ class FunctionService:
         else:
             return FunctionService.multiplication(x, FunctionService.pow(x, (pow - 1)))
 
-    def factorial(self):
-        pass
+    def factorial(x):
+        if x == 0:
+            return 1
+        else:
+            return FunctionService.multiplication(x, FunctionService.factorial((x - 1)))
 
     def roofDivision(self):
         pass
