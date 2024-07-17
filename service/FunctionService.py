@@ -15,8 +15,11 @@ class FunctionService:
         else:
             return FunctionService.sum(x, FunctionService.multiplication(x, (y - 1)))
 
-    def potentiation(self):
-        pass
+    def potentiation(x, pow):
+        if pow == 0:
+            return 1
+        else:
+            return FunctionService.multiplication(x, FunctionService.potentiation(x, (pow - 1)))
 
     def factorial(self):
         pass
