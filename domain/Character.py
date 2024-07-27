@@ -23,3 +23,4 @@ class Character(ABC):
 
     def get_hp(self):
         return self.hp
+
