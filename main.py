@@ -1,4 +1,5 @@
 from service.FunctionService import FunctionService
+from domain.Character import  Character
 
 if __name__ == "__main__":
     print('Soma:', FunctionService.sum(5, 9))               # Esperado: 14
@@ -10,3 +11,5 @@ if __name__ == "__main__":
     print('Divisão Piso:', FunctionService.floorDivision(10, 3))  # Esperado: 3
     print('Porcentagem:', FunctionService.percentage(20, 50))  # Esperado: 10 (20% de 50 é 10)
     print('Módulo:', FunctionService.modulus(10, 3))         # Esperado: 1 (10 % 3 é 1)
+
+    character = Character("PedrinhoBoiola", 100, 0)
