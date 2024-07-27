@@ -7,22 +7,19 @@ class Character(ABC):
         self.hp = hp
         self.ult = ult
 
-    @abstractmethod
-    def light_attack(self, character):
-        pass
 
-    @abstractmethod
-    def medium_attack(self, character):
-        pass
+    def attack(self, dmg):
+        self.hp -= dmg
+        return
 
-    @abstractmethod
-    def heavy_attack(self, character):
-        pass
 
-    @abstractmethod
     def verify_ult(self):
         return self.ult > 3
 
-    @abstractmethod
+
     def is_alive(self):
         return self.hp > 0
+
+
+    def get_hp(self):
+        return self.hp

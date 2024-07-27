@@ -3,14 +3,14 @@ from domain.Character import Character
 
 class CharacterHealer(Character):
 
-    def light_attack(self, character):
-        character.hp -= 100
+    def light_attack(self, dmg, character):
+        character.attack(dmg)
         return
 
-    def medium_attack(self, character):
-        character.hp -= 100
+    def medium_attack(self, dmg, character):
+        character.attack(dmg)
         return
 
-    def heavy_attack(self, character):
-        character.hp -= 100
+    def heavy_attack(self, dmg, character):
+        character.attack(dmg)
         return
