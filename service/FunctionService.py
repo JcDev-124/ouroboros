@@ -58,13 +58,13 @@ class FunctionService:
         return FunctionService.floorDivision(FunctionService.multiplication(x, y), 100)
 
     @staticmethod
-    def module(x, y):
+    def modulus(x, y):
         if y == 0:
             raise ValueError("Divisor não pode ser zero")
         if x < y:
             return x
         else:
-            return FunctionService.module(FunctionService.subtraction(x, y), y)
+            return FunctionService.modulus(FunctionService.subtraction(x, y), y)
 
     @staticmethod
     def __next(x):

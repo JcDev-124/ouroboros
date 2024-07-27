@@ -9,4 +9,4 @@ if __name__ == "__main__":
     print('Divisão Teto:', FunctionService.roofDivision(10, 3))  # Esperado: 4
     print('Divisão Piso:', FunctionService.floorDivision(10, 3))  # Esperado: 3
     print('Porcentagem:', FunctionService.percentage(20, 50))  # Esperado: 10 (20% de 50 é 10)
-    print('Módulo:', FunctionService.module(10, 3))         # Esperado: 1 (10 % 3 é 1)
+    print('Módulo:', FunctionService.modulus(10, 3))         # Esperado: 1 (10 % 3 é 1)
