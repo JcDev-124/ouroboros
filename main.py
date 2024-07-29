@@ -4,6 +4,8 @@ from domain.CharacterTank import CharacterTank
 from domain.CharacterDamage import CharacterDamage
 from domain.Character import Character
 
+from domain.questions.Questions import Questions
+
 if __name__ == "__main__":
     print("\nTESTE DAS FUNÇÕES\n")
     print('Soma:', FunctionService.sum(5, 9))               # Esperado: 14
@@ -57,8 +59,17 @@ if __name__ == "__main__":
     print("Vida depois do ataque", character_tank2.get_hp())
     print("------------------------------------------\n")
 
+    print("TESTE OBTER PERGUNTA\n")
+    questions = Questions()
+    print(questions.get_question('easy'))
+    print(questions.get_question('normal'))
+    print(questions.get_question('hard'))
+    print(questions.get_question('ultimate'))
+    print("------------------------------------------\n")
 
-
+    #to do: criar uma classe para validar as respostas. recebe como parâmetro
+    # a pergunta e a resposta dada pelo jogador e retorna 'True' para 
+    # correto ou 'False' caso incorreto.
 
     
 

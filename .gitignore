@@ -1,1 +1,3 @@
 service/__pycache__/FunctionService.cpython-312.pyc
+domain/__pycache__/*
+domain/questions/__pycache__/*
