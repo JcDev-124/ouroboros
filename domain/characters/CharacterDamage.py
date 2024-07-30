@@ -1,9 +1,7 @@
-from domain.Character import Character
+from domain.characters.Character import Character
 
 
-class CharacterTank(Character):
-
-    shield = True
+class CharacterDamage(Character):
 
     def light_attack(self, dmg, character):
         character._attack(dmg)
@@ -17,17 +15,9 @@ class CharacterTank(Character):
         character._attack(dmg)
         return
 
-
-    def _attack(self, dmg):
-        if self.shield:
-            self.shield = False
-            raise ValueError("Ataque bloqueado")
-        self.hp -= dmg
-
-    def ult_attack(self):
+    def ult_attack(self, dmg, character):
         if not self.verify_ult():
             raise ValueError("Ultimate nao disponivel")
 
-        self.shield = True
+        character._attack(dmg * 2)
         self.ult = 0
-

@@ -1,4 +1,4 @@
-from domain.Character import Character
+from domain.characters.Character import Character
 
 
 class CharacterHealer(Character):
