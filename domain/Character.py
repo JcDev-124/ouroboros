@@ -8,7 +8,7 @@ class Character(ABC):
         self.ult = ult
 
 
-    def attack(self, dmg):
+    def _attack(self, dmg):
         self.hp -= dmg
         return
 

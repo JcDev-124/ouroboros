@@ -6,19 +6,19 @@ class CharacterTank(Character):
     shield = True
 
     def light_attack(self, dmg, character):
-        character.attack(dmg)
+        character._attack(dmg)
         return
 
     def medium_attack(self, dmg, character):
-        character.attack(dmg)
+        character._attack(dmg)
         return
 
     def heavy_attack(self, dmg, character):
-        character.attack(dmg)
+        character._attack(dmg)
         return
 
 
-    def __attack(self, dmg):
+    def _attack(self, dmg):
         if self.shield:
             self.shield = False
             raise ValueError("Ataque bloqueado")

@@ -5,15 +5,15 @@ class CharacterHealer(Character):
 
 
     def light_attack(self, dmg, character):
-        character.attack(dmg)
+        character._attack(dmg)
         return
 
     def medium_attack(self, dmg, character):
-        character.attack(dmg)
+        character._attack(dmg)
         return
 
     def heavy_attack(self, dmg, character):
-        character.attack(dmg)
+        character._attack(dmg)
         return
 
     def ult_attack(self):
