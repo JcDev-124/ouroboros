@@ -3,6 +3,8 @@ import random
 from domain.questions.Question import Question
 
 class Questions:
+
+
     def __init__(self):
         self.questions_easy = [
             Question(
