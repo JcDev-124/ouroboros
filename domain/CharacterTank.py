@@ -18,7 +18,7 @@ class CharacterTank(Character):
         return
 
 
-    def attack(self, dmg):
+    def __attack(self, dmg):
         if self.shield:
             self.shield = False
             raise ValueError("Ataque bloqueado")

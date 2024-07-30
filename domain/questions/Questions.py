@@ -173,3 +173,19 @@ class Questions:
             return "Invalid difficulty level. Choose between 'easy', 'normal', 'hard', or 'ultimate'."
         
         return question
+
+    def ask_question(self, level):
+        questions = Questions()
+        question = questions.get_question(level)
+
+        if isinstance(question, str):
+            print(question)
+            return
+
+        print(question.question)
+        user_answer = input("Sua resposta: ")
+
+        if question.validate_answer(user_answer):
+            return True
+        else:
+            return False
