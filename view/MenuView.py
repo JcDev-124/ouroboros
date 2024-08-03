@@ -1,3 +1,5 @@
+from domain.characters.Character import Character
+from domain.player.Player import Player
 from view.SelectCharacters import SelectCharacters
 import pygame
 import sys
@@ -45,14 +47,21 @@ class MenuView:
         self.drawText(text, font, WHITE, screen, x + 20, y + 10)
 
     # Ações dos botões
-    def startGameWithTwoPlayers(self):
-        selectCharacters.startGame(2)
+    def selectTwoPlayers(self):
+        players = []
+        for i in range(2):
+            players.append(Player(i))
+
+        selectCharacters.startGame(players)
         self.quitGame()
 
-    def startGameWithThreePlayers(self):
-        selectCharacters.startGame(3)
-        self.quitGame()
+    def selectThreePlayers(self):
+        players = []
+        for i in range(3):
+            players.append(Player(i))
 
+        selectCharacters.startGame(players)
+        self.quitGame()
 
     def quitGame(self):
         pygame.quit()
@@ -66,8 +75,8 @@ class MenuView:
     
             self.drawText('Bem vindo ao OuroBoros', font, WHITE, screen, 200, 50)
     
-            self.drawButton('2 Jogadores', 150, 200, 200, 50, GRAY, WHITE, self.startGameWithTwoPlayers)
-            self.drawButton('3 Jogadores', 150, 350, 200, 50, GRAY, WHITE, self.startGameWithThreePlayers)
+            self.drawButton('2 Jogadores', 150, 200, 200, 50, GRAY, WHITE, self.selectTwoPlayers)
+            self.drawButton('3 Jogadores', 150, 350, 200, 50, GRAY, WHITE, self.selectThreePlayers)
             self.drawButton('Sair', 150, 500, 200, 50, GRAY, WHITE, self.quitGame)
     
             for event in pygame.event.get():
