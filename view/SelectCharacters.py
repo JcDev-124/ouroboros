@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-class MatchView:
+class SelectCharacters:
     def startGame(self, amountPlayers):
         self.newWindow()
         pass

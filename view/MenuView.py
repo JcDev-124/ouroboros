@@ -1,4 +1,4 @@
-from view.MatchView import MatchView
+from view.SelectCharacters import SelectCharacters
 import pygame
 import sys
 
@@ -16,7 +16,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (100, 100, 100)
 
-matchView = MatchView()
+selectCharacters = SelectCharacters()
 
 # Configurações de fonte
 font = pygame.font.Font(None, 30)
@@ -46,11 +46,11 @@ class MenuView:
 
     # Ações dos botões
     def startGameWithTwoPlayers(self):
-        matchView.startGame(2)
+        selectCharacters.startGame(2)
         self.quitGame()
 
     def startGameWithThreePlayers(self):
-        matchView.startGame(3)
+        selectCharacters.startGame(3)
         self.quitGame()
 
 
