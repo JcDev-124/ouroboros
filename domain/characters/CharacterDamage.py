@@ -3,6 +3,10 @@ from domain.characters.Character import Character
 
 class CharacterDamage(Character):
 
+    def __init__(self):
+        super().__init__("Hercules", 500, 0)
+        self.sprite = (f'./assets/dano.png')
+
     def light_attack(self, dmg, character):
         character._attack(dmg)
         return

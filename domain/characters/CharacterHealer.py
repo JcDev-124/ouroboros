@@ -3,7 +3,9 @@ from domain.characters.Character import Character
 
 class CharacterHealer(Character):
 
-
+    def __init__(self):
+        super().__init__("Asclepio", 300, 0)
+        self.sprite = (f'./assets/cura.png')
     def light_attack(self, dmg, character):
         character._attack(dmg)
         return

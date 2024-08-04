@@ -6,6 +6,7 @@ class Character(ABC):
         self.name = name
         self.hp = hp
         self.ult = ult
+        self.sprite = None
 
 
     def _attack(self, dmg):
@@ -24,3 +25,5 @@ class Character(ABC):
     def get_hp(self):
         return self.hp
 
+    def getSprite(self):
+        return self.sprite

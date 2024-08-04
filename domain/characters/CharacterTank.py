@@ -3,6 +3,10 @@ from domain.characters.Character import Character
 
 class CharacterTank(Character):
 
+    def __init__(self):
+        super().__init__("Atlas", 1000, 0)
+        self.sprite = (f'./assets/tanque.png')
+
     shield = True
 
     def light_attack(self, dmg, character):
