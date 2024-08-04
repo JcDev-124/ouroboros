@@ -42,3 +42,6 @@ class MatchService:
             print(e)
 
         self.attacker = defender
+
+    def getPlayers(self):
+        return self.players

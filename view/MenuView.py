@@ -1,5 +1,6 @@
 from domain.characters.Character import Character
 from domain.player.Player import Player
+from service.MatchService import MatchService
 from view.SelectCharacters import SelectCharacters
 import pygame
 import sys
@@ -24,7 +25,7 @@ selectCharacters = SelectCharacters()
 font = pygame.font.Font(None, 30)
 class MenuView:
 
-
+    matchService = MatchService()
     # Função para desenhar texto
     def drawText(self, text, font, color, surface, x, y):
         text_obj = font.render(text, True, color)
@@ -48,19 +49,17 @@ class MenuView:
 
     # Ações dos botões
     def selectTwoPlayers(self):
-        players = []
         for i in range(2):
-            players.append(Player(i))
+            self.matchService.addPlayer(Player(i))
 
-        selectCharacters.startGame(players)
+        selectCharacters.startGame(self.matchService)
         self.quitGame()
 
     def selectThreePlayers(self):
-        players = []
         for i in range(3):
-            players.append(Player(i))
+            self.matchService.addPlayer(Player(i))
 
-        selectCharacters.startGame(players)
+        selectCharacters.startGame(self.matchService)
         self.quitGame()
 
     def quitGame(self):

@@ -1,6 +1,8 @@
 import pygame
 import sys
 
+from service.MatchService import MatchService
+
 # Inicialização do Pygame
 pygame.init()
 
@@ -18,8 +20,10 @@ GRAY = (100, 100, 100)
 # Configurações de fonte
 font = pygame.font.Font(None, 30)
 class SelectCharacters:
-    def startGame(self, amountPlayers):
-        self.newWindow(amountPlayers)
+
+    def startGame(self, matchService):
+        self.matchService = matchService
+        self.newWindow()
         pass
 
         # Função para desenhar texto
@@ -43,7 +47,7 @@ class SelectCharacters:
 
         self.drawText(text, font, WHITE, screen, x + 20, y + 10)
 
-    def newWindow(self, players):
+    def newWindow(self):
         screen = pygame.display.set_mode((1280, 720))
         pygame.display.set_caption("Partida")
 
@@ -56,12 +60,12 @@ class SelectCharacters:
             self.drawText('Seleção de Jogadores', font, WHITE, screen, 200, 50)
 
             x = 200
-            for idx, player in enumerate(players):
+            for idx, player in enumerate(self.matchService.getPlayers()):
                 screen.blit(pygame.transform.scale(image, (100, 100)), (x, 300))
                 self.drawButton(str(player.getId() + 1), x, 410, 100, 40, GRAY, WHITE)
                 x += 110
 
-            #self.drawButton('Sair', 150, y, 200, 50, GRAY, WHITE, self.quitGame)
+            self.drawButton('Iniciar partida', 550, 600, 200, 50, GRAY, WHITE, self.matchService.startMatch())
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
