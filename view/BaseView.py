@@ -34,14 +34,18 @@ class BaseView(ABC):
         textRectangle.topleft = coordinates
         surface.blit(textObj, textRectangle)
 
-    def _drawButton(self, text, font, color, hoverColor, coordinates, size, action=None):
+    def _drawButton(self, text, font, color, hoverColor, coordinates, size, action=None, parameters = None):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
+
 
         if coordinates[0] + size[0] > mouse[0] > coordinates[0] and coordinates[1] + size[1] > mouse[1] > coordinates[1]:
             pygame.draw.rect(self._screen, hoverColor, (coordinates[0], coordinates[1], size[0], size[1]))
             if click[0] == 1 and action is not None and not self._button_pressed:
-                action()
+                if parameters == None:
+                    action()
+                else:
+                    action(parameters)
                 self._button_pressed = True
         else:
             pygame.draw.rect(self._screen, color, (coordinates[0], coordinates[1], size[0], size[1]))
