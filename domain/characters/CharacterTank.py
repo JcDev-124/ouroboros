@@ -6,6 +6,10 @@ class CharacterTank(Character):
     def __init__(self):
         super().__init__("Atlas", 1000, 0)
         self.sprite = (f'./assets/tanque.png')
+        self.nameHeavyAttack = " attack 1 - tank "
+        self.nameMediumAttack = " attack 2 - tank "
+        self.nameHeavyAttack =  " attack 3 - tank "
+        self.nameUltimateAttack =  " attack 4 - tank "
 
     shield = True
 
