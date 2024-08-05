@@ -14,6 +14,7 @@ class SelectCharacters(BaseView):
     indexesSprite = [0, 0, 0]
     characters = [CharacterDamage(), CharacterHealer(), CharacterTank()]
 
+
     def __init__(self, matchService):
         self.matchService = matchService
         super().__init__()
@@ -33,9 +34,9 @@ class SelectCharacters(BaseView):
     def selectCharacter(self):
 
         funCharacter = {
-            0: CharacterDamage,
-            1: CharacterHealer,
-            2: CharacterTank
+            0: CharacterDamage(),
+            1: CharacterHealer(),
+            2: CharacterTank()
         }
 
         selectedCharacter = None
@@ -53,7 +54,7 @@ class SelectCharacters(BaseView):
             print(e)
             return
 
-        MatchView().run()
+        MatchView().run(self.matchService)
         self._quit()
 
     def checkSelectedPlayers(self):
