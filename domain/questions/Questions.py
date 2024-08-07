@@ -176,7 +176,7 @@ class Questions:
         
         return question
 
-    def ask_question(self, level):
+    def ask_question(self, level, userAnswer):
         questions = Questions()
         question = questions.get_question(level)
 
@@ -185,9 +185,8 @@ class Questions:
             return
 
         print(question.question)
-        user_answer = input("Sua resposta: ")
 
-        if question.validate_answer(user_answer):
+        if question.validate_answer(userAnswer):
             return True
         else:
             return False
