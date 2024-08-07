@@ -1,12 +1,18 @@
 import random
 
-
+states = {
+    'selectingDefender': 1,
+    'SelectingAttack': 2,
+}
 class MatchService:
     players = []
 
+
+    currentState = states['selectingDefender']
     def __init__(self):
         self.grantCharacter = None
         self.attacker = None
+        self.state = []
 
     def addPlayer(self, player):
         try:
@@ -45,3 +51,9 @@ class MatchService:
 
     def getPlayers(self):
         return self.players
+
+    def setCurrentState(self, state):
+        self.currentState = state
+
+    def getCurrentState(self):
+        return self.currentState
