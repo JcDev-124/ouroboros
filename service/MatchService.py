@@ -1,5 +1,7 @@
 import random
 
+from domain.characters.CharacterDamage import CharacterDamage
+
 states = {
     'selectingDefender': 1,
     'selectingAttack': 2,
@@ -44,7 +46,10 @@ class MatchService:
             elif level == 'heavy':
                 self.attacker.getCharacter().heavy_attack(damage, defender.getCharacter())
             elif level == 'ultimate':
-                self.attacker.getCharacter().ult_attack(damage, defender.getCharacter())
+                if type(self.attacker.getCharacter()) is CharacterDamage:
+                    self.attacker.getCharacter().ult_attack(damage, defender.getCharacter())
+                else:
+                    self.attacker.getCharacter().ult_attack()
             else:
                 raise ValueError("Invalid attack type.")
             self.__setNextAttacker()
