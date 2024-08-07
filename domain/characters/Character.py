@@ -5,6 +5,7 @@ class Character(ABC):
     def __init__(self, name, hp, ult):
         self.name = name
         self.hp = hp
+        self._maxHpValue = self.hp
         self.ult = ult
         self.sprite = None
         self.nameLightAttack = None
@@ -16,14 +17,11 @@ class Character(ABC):
         self.hp -= dmg
         return
 
-
     def verify_ult(self):
         return self.ult > 3
 
-
     def is_alive(self):
         return self.hp > 0
-
 
     def get_hp(self):
         return self.hp
@@ -33,6 +31,7 @@ class Character(ABC):
 
     def getNameLightAttack(self):
         return self.nameLightAttack
+
     def getNameMediumAttack(self):
         return self.nameMediumAttack
 

@@ -10,7 +10,7 @@ class CharacterHealer(Character):
         self.nameMediumAttack = "attack 2 - healer"
         self.nameHeavyAttack = "attack 3 - healer"
         self.nameUltimateAttack = "attack 4 - healer"
-        self._maxHpValue = self.hp
+
     def light_attack(self, intensity, character):
         character._attack(10 * intensity)
         return
