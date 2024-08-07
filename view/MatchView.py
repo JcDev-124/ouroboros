@@ -5,6 +5,7 @@ from domain.questions.Questions import Questions
 from view.BaseView import BaseView
 from view.Colors import Colors
 from service.MatchService import states
+
 class MatchView(BaseView):
     matchService = None
     indexAttacker = 0
@@ -12,13 +13,19 @@ class MatchView(BaseView):
     questionLevel = None
     attackLevel = None
     questionReceived = None
+
+    attackIntensity = 5
+
     def __init__(self):
         super().__init__()
 
     def run(self, matchService):
         self.matchService = matchService
+        self.matchService.startMatch()
+
         gameBarSize = (self._screenWidth, 220)
         gameBarSurface = pygame.Surface(gameBarSize)
+
         while self._running:
             self._screen.fill(Colors.BLACK)
             gameBarSurface.fill(Colors.CYAN)
@@ -33,30 +40,32 @@ class MatchView(BaseView):
                 self.drawQuestion()
                 self._drawInputBox()
 
-            if self._insertedText != '':
-                print(self.validateAnswer())
-                self._insertedText = ''
-                self.questionReceived = None
-            else:
-                pass
+                if self._insertedText != '':
+                    print(self.validateAnswer())
+                    self._insertedText = ''
+                    self.questionReceived = None
+                else:
+                    pass
+
+            elif self.matchService.getCurrentState() == states['attacking']:
+                self.attack()
 
             self.drawFighters()
-
-
+            
             self._event()
             pygame.display.update()
 
         pygame.quit()
 
     def drawAttackOptions(self):
-        attacker = self.matchService.getPlayers()[self.indexAttacker].getCharacter()
+        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         self._drawButton(attacker.getNameLightAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 500), (300, 70), self.setLevel, ('easy', 'light'))
         self._drawButton(attacker.getNameMediumAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 500), (300, 70), self.setLevel, ('normal', 'medium'))
         self._drawButton(attacker.getNameHeavyAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 580), (300, 70), self.setLevel, ('hard', 'heavy'))
         self._drawButton(attacker.getNameUltimateAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 580), (300, 70),self.setLevel, ('ultimate', 'ultimate'))
 
     def drawAttackerMiniature(self):
-        attacker = self.matchService.getPlayers()[self.indexAttacker].getCharacter()
+        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
 
         self._drawImage(attacker.getSprite(), (200, 200), (75, 510))
 
@@ -64,13 +73,11 @@ class MatchView(BaseView):
         self.indexDefender = indexDefender
         self.matchService.setCurrentState(states['selectingAttack'])
 
-
-
     def drawDefenderOptions(self):
         players = self.matchService.getPlayers()
         x = 350
         for i, player in enumerate(players):
-            if i != self.indexAttacker:
+            if i != self.matchService.getAttackerIndex():
                 self._drawButton("", self._font, Colors.GRAY, Colors.WHITE, (x, 510),
                                  (150, 150), self.selectedDefender, i)
                 self._drawImage(player.getCharacter().getSprite(), (150, 150), (x, 510))
@@ -78,7 +85,7 @@ class MatchView(BaseView):
                 x += 160
 
     def drawFighters(self):
-        attacker = self.matchService.getPlayers()[self.indexAttacker].getCharacter()
+        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
         self._drawImage(attacker.getSprite(), (200, 200), (300, 250))
         self._drawImage(defender.getSprite(), (200, 200), (600, 250))
@@ -96,4 +103,12 @@ class MatchView(BaseView):
         self._drawText(self.questionReceived.question, self._font, Colors.WHITE, self._screen, (200, 50))
 
     def validateAnswer(self):
+        self.matchService.setCurrentState(states['attacking'])
         return self.questionReceived.validate_answer(self._insertedText)
+
+    def attack(self):
+        defenderPlayer = self.matchService.getPlayers()[self.indexDefender]
+        self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer)
+        print(defenderPlayer.getCharacter().hp)
+        self.matchService.setCurrentState(states['selectingDefender'])
+
