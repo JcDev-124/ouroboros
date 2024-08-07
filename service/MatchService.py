@@ -3,13 +3,15 @@ import random
 states = {
     'selectingDefender': 1,
     'selectingAttack': 2,
-    'waitingAnswer': 3
+    'waitingAnswer': 3,
+    'attacking': 4,
 }
+
 class MatchService:
     players = []
 
-
     currentState = states['selectingDefender']
+
     def __init__(self):
         self.grantCharacter = None
         self.attacker = None
@@ -42,9 +44,10 @@ class MatchService:
             elif level == 'heavy':
                 self.attacker.getCharacter().heavy_attack(damage, defender.getCharacter())
             elif level == 'ultimate':
-                self.attacker.getCharacter().ultimate_attack(damage, defender.getCharacter())
+                self.attacker.getCharacter().ult_attack(damage, defender.getCharacter())
             else:
                 raise ValueError("Invalid attack type.")
+            self.__setNextAttacker()
         except ValueError as e:
             print(e)
 
@@ -58,3 +61,14 @@ class MatchService:
 
     def getCurrentState(self):
         return self.currentState
+
+    def getAttackerIndex(self):
+        return self.players.index(self.attacker)
+
+    def __setNextAttacker(self):
+        maxIndex = len(self.players) - 1
+        currentAttackerIndex = self.getAttackerIndex()
+        if (maxIndex) == currentAttackerIndex:
+            self.attacker = self.players[0]
+        else:
+            self.attacker = self.players[currentAttackerIndex + 1]
