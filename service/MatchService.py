@@ -52,6 +52,7 @@ class MatchService:
                     self.attacker.getCharacter().ult_attack()
             else:
                 raise ValueError("Invalid attack type.")
+            self.__eliminatePlayer()
             self.__setNextAttacker()
         except ValueError as e:
             print(e)
@@ -77,3 +78,8 @@ class MatchService:
             self.attacker = self.players[0]
         else:
             self.attacker = self.players[currentAttackerIndex + 1]
+
+    def __eliminatePlayer(self):
+        for player in self.players:
+            if player.getCharacter().get_hp() <= 0:
+                self.players.remove(player)
