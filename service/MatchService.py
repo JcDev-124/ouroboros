@@ -2,7 +2,8 @@ import random
 
 states = {
     'selectingDefender': 1,
-    'SelectingAttack': 2,
+    'selectingAttack': 2,
+    'waitingAnswer': 3
 }
 class MatchService:
     players = []
