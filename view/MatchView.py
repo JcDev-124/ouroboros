@@ -1,5 +1,7 @@
 import pygame
 
+from domain.questions.Question import Question
+from domain.questions.Questions import Questions
 from view.BaseView import BaseView
 from view.Colors import Colors
 from service.MatchService import states
@@ -7,6 +9,9 @@ class MatchView(BaseView):
     matchService = None
     indexAttacker = 0
     indexDefender = 0
+    questionLevel = None
+    attackLevel = None
+    questionReceived = None
     def __init__(self):
         super().__init__()
 
@@ -16,15 +21,24 @@ class MatchView(BaseView):
         gameBarSurface = pygame.Surface(gameBarSize)
         while self._running:
             self._screen.fill(Colors.BLACK)
-            gameBarSurface.fill(Colors.WHITE)
+            gameBarSurface.fill(Colors.CYAN)
             self._screen.blit(gameBarSurface, (0, (self._screenHeight - gameBarSize[1])))
 
             self.drawAttackerMiniature()
-
             if self.matchService.getCurrentState() == states['selectingDefender']:
                 self.drawDefenderOptions()
-            elif self.matchService.getCurrentState() == states['selectingAttacker']:
+            elif self.matchService.getCurrentState() == states['selectingAttack']:
                 self.drawAttackOptions()
+            elif self.matchService.getCurrentState() == states['waitingAnswer']:
+                self.drawQuestion()
+                self._drawInputBox()
+
+            if self._insertedText != '':
+                print(self.validateAnswer())
+                self._insertedText = ''
+                self.questionReceived = None
+            else:
+                pass
 
             self.drawFighters()
 
@@ -36,10 +50,10 @@ class MatchView(BaseView):
 
     def drawAttackOptions(self):
         attacker = self.matchService.getPlayers()[self.indexAttacker].getCharacter()
-        self._drawButton(attacker.getNameLightAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 500), (300, 70))
-        self._drawButton(attacker.getNameMediumAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 500), (300, 70))
-        self._drawButton(attacker.getNameHeavyAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 580), (300, 70))
-        self._drawButton(attacker.getNameUltimateAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 580), (300, 70))
+        self._drawButton(attacker.getNameLightAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 500), (300, 70), self.setLevel, ('easy', 'light'))
+        self._drawButton(attacker.getNameMediumAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 500), (300, 70), self.setLevel, ('normal', 'medium'))
+        self._drawButton(attacker.getNameHeavyAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 580), (300, 70), self.setLevel, ('hard', 'heavy'))
+        self._drawButton(attacker.getNameUltimateAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 580), (300, 70),self.setLevel, ('ultimate', 'ultimate'))
 
     def drawAttackerMiniature(self):
         attacker = self.matchService.getPlayers()[self.indexAttacker].getCharacter()
@@ -68,3 +82,18 @@ class MatchView(BaseView):
         defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
         self._drawImage(attacker.getSprite(), (200, 200), (300, 250))
         self._drawImage(defender.getSprite(), (200, 200), (600, 250))
+
+    def setLevel(self, level):
+        print(level)
+        self.questionLevel = level[0]
+        self.attackLevel = level[1]
+        self.matchService.setCurrentState(states['waitingAnswer'])
+
+    def drawQuestion(self):
+        if not self.questionReceived:
+            question = Questions()
+            self.questionReceived = question.get_question(self.questionLevel)
+        self._drawText(self.questionReceived.question, self._font, Colors.WHITE, self._screen, (200, 50))
+
+    def validateAnswer(self):
+        return self.questionReceived.validate_answer(self._insertedText)
