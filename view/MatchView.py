@@ -75,14 +75,21 @@ class MatchView(BaseView):
 
     def drawDefenderOptions(self):
         players = self.matchService.getPlayers()
-        x = 350
-        for i, player in enumerate(players):
-            if i != self.matchService.getAttackerIndex():
-                self._drawButton("", self._font, Colors.GRAY, Colors.WHITE, (x, 510),
-                                 (150, 150), self.selectedDefender, i)
-                self._drawImage(player.getCharacter().getSprite(), (150, 150), (x, 510))
 
-                x += 160
+        if len(players) == 2:
+            if self.matchService.getAttackerIndex() == 0:
+                self.selectedDefender(1)
+            else:
+                self.selectedDefender(0)
+        else:
+            x = 350
+            for i, player in enumerate(players):
+                if i != self.matchService.getAttackerIndex():
+                    self._drawButton("", self._font, Colors.GRAY, Colors.WHITE, (x, 510),
+                                     (150, 150), self.selectedDefender, i)
+                    self._drawImage(player.getCharacter().getSprite(), (150, 150), (x, 510))
+
+                    x += 160
 
     def drawFighters(self):
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
