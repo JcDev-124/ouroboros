@@ -12,6 +12,7 @@ class SelectCharacters(BaseView):
     indexPlayer = 0
     indexCharacter = 0
     indexesSprite = [0, 0, 0]
+    fontSize = 16
     characters = [CharacterDamage(), CharacterHealer(), CharacterTank()]
 
 
@@ -51,7 +52,8 @@ class SelectCharacters(BaseView):
         try:
             self.checkSelectedPlayers()
         except ValueError as e:
-            print(e)
+            self._drawText(e, self.fontSize + 2, self._mainFont, Colors.WHITE, (640, 50))
+
             return
 
         MatchView().run(self.matchService)
@@ -64,30 +66,33 @@ class SelectCharacters(BaseView):
 
     def run(self):
         self._setCaption("Match")
-
         while self._running:
             self._screen.fill(Colors.BLACK)
-            font = './assets/fonts/mainFont.ttf'
-            fontSize = 16
 
-            self._drawText('Seleção de Jogadores', fontSize + 2, font, Colors.WHITE, (200, 50))
 
-            x = 200
+            self._drawBackground('./assets/champion-selection/background.gif')
+
+            self._drawText('Seleção de Jogadores', self.fontSize + 2, self._mainFont, Colors.WHITE, (640, 50))
+
+            x = 150
             for idx, player in enumerate(self.matchService.getPlayers()):
                 if idx == self.indexPlayer:
-                    self._drawImage(self.characters[self.indexCharacter].getSprite(), (200, 200), (x, 300))
-
-                    self._drawButton('<', font, fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None, self.previousCharacter)
+                    self._drawCharacter(self.characters[self.indexCharacter].getSprite(), (250, 300), (x, 300))
+                    self._drawButton('<', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None,
+                                     self.previousCharacter)
                     x += 76
-                    self._drawButton(str(player.getId() + 1), font, fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None, self.selectCharacter)
+                    self._drawButton(str(player.getId() + 1), self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40),
+                                     None, self.selectCharacter)
                     x += 76
-                    self._drawButton('>', font, fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None, self.nextCharacter)
+                    self._drawButton('>', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None,
+                                     self.nextCharacter)
                     x += 210
                 else:
-                    self._drawImage(self.characters[self.indexesSprite[idx]].getSprite(), (200, 200),  (x, 300))
+                    self._drawCharacter(self.characters[self.indexesSprite[idx]].getSprite(), (200, 200), (x, 300))
                     x += 362
 
-            self._drawButton('Iniciar partida', font, fontSize, Colors.LIGHT_GRAY, (550, 600), (200, 50), None, self.startMatch)
+            self._drawButton('Iniciar partida', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (525, 600), (200, 50), None,
+                             self.startMatch)
 
             self._event()
 
