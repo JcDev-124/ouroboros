@@ -5,7 +5,9 @@ class CharacterTank(Character):
 
     def __init__(self):
         super().__init__("Atlas", 1500, 0)
-        self.sprite = (f'./assets/tanque.png')
+        self.sprite = (f'./assets/champion-selection/tank.gif')
+        self.spriteRotate = (f'./assets/champion-selection/healerRotate.gif')
+
         self.nameHeavyAttack = "attack 1 - tank"
         self.nameMediumAttack = "attack 2 - tank"
         self.nameHeavyAttack = "attack 3 - tank"

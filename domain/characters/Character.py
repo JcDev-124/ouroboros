@@ -8,6 +8,7 @@ class Character(ABC):
         self._maxHpValue = self.hp
         self.ult = ult
         self.sprite = None
+        self.spriteRotate = None
         self.nameLightAttack = None
         self.nameMediumAttack = None
         self.nameHeavyAttack = None
@@ -28,6 +29,9 @@ class Character(ABC):
 
     def getSprite(self):
         return self.sprite
+
+    def getSpriteRotate(self):
+        return self.spriteRotate
 
     def getNameLightAttack(self):
         return self.nameLightAttack

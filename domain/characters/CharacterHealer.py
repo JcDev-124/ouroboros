@@ -5,7 +5,9 @@ class CharacterHealer(Character):
 
     def __init__(self):
         super().__init__("Asclepio", 1000, 0)
-        self.sprite = (f'./assets/cura.png')
+        self.sprite = (f'./assets/champion-selection/healer.gif')
+        self.spriteRotate = (f'./assets/champion-selection/healerRotate.gif')
+
         self.nameHeavyAttack = "attack 1 - healer"
         self.nameMediumAttack = "attack 2 - healer"
         self.nameHeavyAttack = "attack 3 - healer"
