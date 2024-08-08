@@ -28,14 +28,38 @@ class MenuView(BaseView):
 
     def run(self):
         while self._running:
-            self._screen.fill(Colors.BLACK)
+            clock = pygame.time.Clock()
+            fps = 60
 
-            self._drawText('Bem vindo ao OuroBoros', self._font, Colors.WHITE, self._screen, (200, 50))
-            self._drawButton('2 Jogadores', self._font,Colors.GRAY, Colors.WHITE,(150, 200), (200, 50),  self.selectTwoPlayers)
-            self._drawButton('3 Jogadores', self._font, Colors.GRAY, Colors.WHITE,(150, 350), (200, 50),  self.selectThreePlayers)
-            self._drawButton('Sair', self._font, Colors.GRAY, Colors.WHITE,(150, 500), (200, 50),  self._quit)
+            self._drawBackground('./assets/images/menu/menuBackgroud.gif')
+            self._drawText('OuroBoros', 124, './assets/fonts/titleFont.ttf', Colors.WHITE, (self._screenWidth / 2, 115))
+            self.drawOptions((280, 80))
 
             self._event()
             pygame.display.update()
+            clock.tick(fps)
 
         pygame.quit()
+
+    def drawOptions(self, optionSize):
+        font = './assets/fonts/mainFont.ttf'
+        fontSize = 28
+        fontOffset = (0, 3)
+        image = './assets/images/buttons/menuButton.png'
+
+        leftGap = 15
+        betweenGap = 10
+        x = (self._screenWidth - leftGap - optionSize[0])
+        y = (self._screenHeight - 20 - optionSize[1])
+
+        self._drawButton('Sair', font, fontSize, Colors.BLACK, (x, y), optionSize, image, self._quit)
+        y -= (betweenGap + optionSize[1])
+
+        self._drawButton('3 Players', font, fontSize, Colors.BLACK, (x, y), optionSize, image, self.selectThreePlayers)
+        y -= (betweenGap + optionSize[1])
+
+        self._drawButton('2 Players', font, fontSize, Colors.BLACK, (x, y), optionSize, image, self.selectTwoPlayers)
+
+
+
+

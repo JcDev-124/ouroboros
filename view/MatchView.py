@@ -40,6 +40,7 @@ class MatchView(BaseView):
                 self.drawQuestion()
                 self._drawInputBox()
 
+
                 if self._insertedText != '':
                     print(self.validateAnswer())
                     self._insertedText = ''
@@ -60,19 +61,16 @@ class MatchView(BaseView):
         pygame.quit()
 
     def drawAttackOptions(self):
+        font = './assets/fonts/mainFont.ttf'
+        fontSize = 14
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-        self._drawButton(attacker.getNameLightAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 500), (300, 70),
-                         self.setLevel, ('easy', 'light'))
-        self._drawButton(attacker.getNameMediumAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 500), (300, 70),
-                         self.setLevel, ('normal', 'medium'))
-        self._drawButton(attacker.getNameHeavyAttack(), self._font, Colors.GRAY, Colors.WHITE, (450, 580), (300, 70),
-                         self.setLevel, ('hard', 'heavy'))
-        self._drawButton(attacker.getNameUltimateAttack(), self._font, Colors.GRAY, Colors.WHITE, (760, 580), (300, 70),
-                         self.setLevel, ('ultimate', 'ultimate'))
+        self._drawButton(attacker.getNameLightAttack(), font, fontSize, Colors.BLACK, (450, 500), (300, 70), None, self.setLevel, ('easy', 'light'))
+        self._drawButton(attacker.getNameMediumAttack(), font, fontSize, Colors.BLACK, (760, 500), (300, 70), None, self.setLevel, ('normal', 'medium'))
+        self._drawButton(attacker.getNameHeavyAttack(), font, fontSize, Colors.BLACK, (450, 580), (300, 70), None, self.setLevel, ('hard', 'heavy'))
+        self._drawButton(attacker.getNameUltimateAttack(), font, fontSize, Colors.BLACK, (760, 580), (300, 70), None, self.setLevel, ('ultimate', 'ultimate'))
 
     def drawAttackerMiniature(self):
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-
         self._drawImage(attacker.getSprite(), (200, 200), (75, 510))
 
     def selectedDefender(self, indexDefender):
@@ -91,9 +89,8 @@ class MatchView(BaseView):
             x = 350
             for i, player in enumerate(players):
                 if i != self.matchService.getAttackerIndex():
-                    self._drawButton("", self._font, Colors.GRAY, Colors.WHITE, (x, 510),
-                                     (150, 150), self.selectedDefender, i)
-                    self._drawImage(player.getCharacter().getSprite(), (150, 150), (x, 510))
+                    self._drawButton("", './assets/fonts/mainFont.ttf', 14, Colors.BLACK, (x, 510),
+                                     (150, 150), player.getCharacter().getSprite(), self.selectedDefender, i)
 
                     x += 160
 
@@ -113,7 +110,7 @@ class MatchView(BaseView):
         if not self.questionReceived:
             question = Questions()
             self.questionReceived = question.get_question(self.questionLevel)
-        self._drawText(self.questionReceived.question, self._font, Colors.WHITE, self._screen, (200, 50))
+        self._drawText(self.questionReceived.question, 14, './assets/fonts/mainFont.ttf', Colors.WHITE, (200, 50))
 
     def validateAnswer(self):
         self.matchService.setCurrentState(states['attacking'])
@@ -127,7 +124,5 @@ class MatchView(BaseView):
     def drawHP(self):
         x = 50
         for idx, player in enumerate(self.matchService.getPlayers()):
-            self._drawText(
-                str(idx) + ": " + str(player.getCharacter().hp),
-                self._font, Colors.WHITE, self._screen, (900, x))
+            self._drawText(str(idx) + ": " + str(player.getCharacter().hp), 14, './assets/fonts/mainFont.ttf', Colors.WHITE, (900, x))
             x += 25

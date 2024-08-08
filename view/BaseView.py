@@ -1,6 +1,10 @@
 import pygame
+import os
 import sys
 from abc import ABC, abstractmethod
+from typing import Iterator, Optional
+from PIL import Image
+
 from view.Colors import Colors
 
 class BaseView(ABC):
@@ -10,19 +14,27 @@ class BaseView(ABC):
         self._screenWidth = 1280
         self._screenHeight = 720
         self._screen = pygame.display.set_mode((self._screenWidth, self._screenHeight))
-        self._font = pygame.font.Font(None, 30)
         self._running = True
         self._button_pressed = False
         self._input_active = False
         self._input_text = ""
         self._insertedText = ""
+        self._soundButton = False
+
+        self._mainFont = './assets/fonts/mainFont.ttf'
         pygame.display.set_caption("Ouroboros")
+        pygame.display.set_icon(pygame.image.load('./assets/icons/favicon.png'))
 
         # Initialize input box attributes
         self._input_box = pygame.Rect(100, 100, 140, 32)  # Example position and size
         self._color_inactive = pygame.Color('lightskyblue3')
         self._color_active = pygame.Color('dodgerblue2')
         self._color = self._color_inactive
+
+        # Initialize GIF frame iterator attribute and counter
+        self._gif_frame_iterator: Optional[Iterator[Image.Image]] = None
+        self._frame_counter = 0
+        self._frame_interval = 7
 
     def _event(self):
         for event in pygame.event.get():
@@ -50,28 +62,46 @@ class BaseView(ABC):
         pygame.quit()
         sys.exit()
 
-    def _drawText(self, text, font, color, surface, coordinates):
+    def _drawText(self, text, size, fontDirectory, color, coordinates, offset=None):
+        font = pygame.font.Font(fontDirectory, size)
         textObj = font.render(text, True, color)
         textRectangle = textObj.get_rect()
-        textRectangle.topleft = coordinates
-        surface.blit(textObj, textRectangle)
+        if offset:
+            textRectangle.center = (coordinates[0] + offset[0], coordinates[1] + offset[1])
+        else:
+            textRectangle.center = coordinates
+        self._screen.blit(textObj, textRectangle)
 
-    def _drawButton(self, text, font, color, hoverColor, coordinates, size, action=None, parameters=None):
+    def _drawButton(self, text, fontDirectory, fontSize, fontColor, coordinates, size, image=None, action=None, parameters=None):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
         if coordinates[0] + size[0] > mouse[0] > coordinates[0] and coordinates[1] + size[1] > mouse[1] > coordinates[1]:
-            pygame.draw.rect(self._screen, hoverColor, (coordinates[0], coordinates[1], size[0], size[1]))
+            if image is None:
+                pygame.draw.rect(self._screen, Colors.LIGHT_GRAY, (coordinates[0], coordinates[1], size[0], size[1]))
+            else:
+                self._drawImage(image, size, coordinates)
+            self.__drawButtonOverlay(size, coordinates)
             if click[0] == 1 and action is not None and not self._button_pressed:
+                self._playAudio('./assets/sounds/click1.ogg')
                 if parameters is None:
                     action()
                 else:
                     action(parameters)
                 self._button_pressed = True
         else:
-            pygame.draw.rect(self._screen, color, (coordinates[0], coordinates[1], size[0], size[1]))
+            if image is None:
+                pygame.draw.rect(self._screen, Colors.GRAY, (coordinates[0], coordinates[1], size[0], size[1]))
+            else:
+                self._drawImage(image, size, coordinates)
 
-        self._drawText(text, font, Colors.WHITE, self._screen, coordinates)
+        self._drawText(text, fontSize, fontDirectory, fontColor, (coordinates[0] + (size[0] / 2), coordinates[1] + (size[1] / 2)))
+
+    def __drawButtonOverlay(self, size, coordinates):
+        s = pygame.Surface(size)
+        s.set_alpha(128)
+        s.fill((0, 0, 0))
+        self._screen.blit(s, coordinates)
 
     def _drawImage(self, directory, size, coordinates):
         self._screen.blit(pygame.transform.scale(pygame.image.load(directory), size), coordinates)
@@ -87,6 +117,40 @@ class BaseView(ABC):
 
         pygame.draw.rect(self._screen, color, self._input_box, 2)
 
-        text_surface = self._font.render(self._input_text, True, Colors.WHITE)
+        text_surface = pygame.font.Font(self._mainFont, 12).render(self._input_text, True, Colors.WHITE)
         self._screen.blit(text_surface, (self._input_box.x + 5, self._input_box.y + 5))
         self._input_box.w = max(200, text_surface.get_width() + 10)
+
+    def _drawBackground(self, directory):
+        if self._gif_frame_iterator is None:
+            self._gif_frame_iterator = self._gifFrameExtractor(directory)
+
+        if self._frame_counter % self._frame_interval == 0:
+            frame = next(self._gif_frame_iterator)
+            frame = frame.convert('RGBA')
+            mode = frame.mode
+            size = frame.size
+            data = frame.tobytes()
+
+            self._pygame_image = pygame.image.fromstring(data, size, mode)
+
+        self._screen.blit(pygame.transform.scale(self._pygame_image, (self._screenWidth, self._screenHeight)), (0, 0))
+        self._frame_counter += 1
+
+    def _gifFrameExtractor(self, gif_path: str) -> Iterator[Image.Image]:
+        if not os.path.isfile(gif_path):
+            raise FileNotFoundError(f"Arquivo não encontrado: {gif_path}")
+
+        gif = Image.open(gif_path)
+
+        while True:
+            for frame in range(gif.n_frames):
+                gif.seek(frame)
+                yield gif.copy()
+
+    def _playAudio(self, audioDirectory):
+        pygame.mixer.music.load(audioDirectory)
+        pygame.mixer.music.play()
+
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
