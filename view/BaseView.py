@@ -4,7 +4,6 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Iterator, Optional
 from PIL import Image
-
 from view.Colors import Colors
 
 class BaseView(ABC):
@@ -20,21 +19,21 @@ class BaseView(ABC):
         self._input_text = ""
         self._insertedText = ""
         self._soundButton = False
-
         self._mainFont = './assets/fonts/mainFont.ttf'
         pygame.display.set_caption("Ouroboros")
         pygame.display.set_icon(pygame.image.load('./assets/icons/favicon.png'))
 
-        # Initialize input box attributes
         self._input_box = pygame.Rect(100, 100, 140, 32)  # Example position and size
         self._color_inactive = pygame.Color('lightskyblue3')
         self._color_active = pygame.Color('dodgerblue2')
         self._color = self._color_inactive
 
-        # Initialize GIF frame iterator attribute and counter
-        self._gif_frame_iterator: Optional[Iterator[Image.Image]] = None
+        self._gif_frame_iterator_bg = None
+        self._gif_frame_iterator_char = {}
         self._frame_counter = 0
         self._frame_interval = 7
+        self._pygame_image_bg = None
+        self._pygame_images_char = {}
 
     def _event(self):
         for event in pygame.event.get():
@@ -72,18 +71,20 @@ class BaseView(ABC):
             textRectangle.center = coordinates
         self._screen.blit(textObj, textRectangle)
 
-    def _drawButton(self, text, fontDirectory, fontSize, fontColor, coordinates, size, image=None, action=None, parameters=None):
+    def _drawButton(self, text, fontDirectory, fontSize, fontColor, coordinates, size, image=None, action=None,
+                    parameters=None):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        if coordinates[0] + size[0] > mouse[0] > coordinates[0] and coordinates[1] + size[1] > mouse[1] > coordinates[1]:
+        if coordinates[0] + size[0] > mouse[0] > coordinates[0] and coordinates[1] + size[1] > mouse[1] > coordinates[
+            1]:
             if image is None:
                 pygame.draw.rect(self._screen, Colors.LIGHT_GRAY, (coordinates[0], coordinates[1], size[0], size[1]))
             else:
                 self._drawImage(image, size, coordinates)
             self.__drawButtonOverlay(size, coordinates)
             if click[0] == 1 and action is not None and not self._button_pressed:
-                self._playAudio('./assets/sounds/click1.ogg')
+                self._playAudio('./assets/sounds/confirm1.ogg')
                 if parameters is None:
                     action()
                 else:
@@ -95,7 +96,8 @@ class BaseView(ABC):
             else:
                 self._drawImage(image, size, coordinates)
 
-        self._drawText(text, fontSize, fontDirectory, fontColor, (coordinates[0] + (size[0] / 2), coordinates[1] + (size[1] / 2)))
+        self._drawText(text, fontSize, fontDirectory, fontColor,
+                       (coordinates[0] + (size[0] / 2), coordinates[1] + (size[1] / 2)))
 
     def __drawButtonOverlay(self, size, coordinates):
         s = pygame.Surface(size)
@@ -122,20 +124,39 @@ class BaseView(ABC):
         self._input_box.w = max(200, text_surface.get_width() + 10)
 
     def _drawBackground(self, directory):
-        if self._gif_frame_iterator is None:
-            self._gif_frame_iterator = self._gifFrameExtractor(directory)
+        if self._gif_frame_iterator_bg is None:
+            self._gif_frame_iterator_bg = self._gifFrameExtractor(directory)
 
         if self._frame_counter % self._frame_interval == 0:
-            frame = next(self._gif_frame_iterator)
+            frame = next(self._gif_frame_iterator_bg)
             frame = frame.convert('RGBA')
             mode = frame.mode
             size = frame.size
             data = frame.tobytes()
 
-            self._pygame_image = pygame.image.fromstring(data, size, mode)
+            self._pygame_image_bg = pygame.image.fromstring(data, size, mode)
 
-        self._screen.blit(pygame.transform.scale(self._pygame_image, (self._screenWidth, self._screenHeight)), (0, 0))
+        if self._pygame_image_bg is not None:
+            self._screen.blit(pygame.transform.scale(self._pygame_image_bg, (self._screenWidth, self._screenHeight)), (0, 0))
+
         self._frame_counter += 1
+
+    def _drawCharacter(self, directory, tam, pos):
+        if directory not in self._gif_frame_iterator_char:
+            self._gif_frame_iterator_char[directory] = self._gifFrameExtractor(directory)
+
+        if self._frame_counter % self._frame_interval == 0:
+            frame = next(self._gif_frame_iterator_char[directory])
+            frame = frame.convert('RGBA')
+
+            size = frame.size
+            data = frame.tobytes()
+            mode = frame.mode
+
+            self._pygame_images_char[directory] = pygame.image.fromstring(data, size, mode)
+
+        if directory in self._pygame_images_char and self._pygame_images_char[directory] is not None:
+            self._screen.blit(pygame.transform.scale(self._pygame_images_char[directory], tam), pos)
 
     def _gifFrameExtractor(self, gif_path: str) -> Iterator[Image.Image]:
         if not os.path.isfile(gif_path):
@@ -151,6 +172,3 @@ class BaseView(ABC):
     def _playAudio(self, audioDirectory):
         pygame.mixer.music.load(audioDirectory)
         pygame.mixer.music.play()
-
-        while pygame.mixer.music.get_busy():
-            pygame.time.Clock().tick(10)
