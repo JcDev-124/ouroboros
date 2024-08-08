@@ -14,7 +14,8 @@ class SelectCharacters(BaseView):
     indexesSprite = [0, 0, 0]
     fontSize = 16
     characters = [CharacterDamage(), CharacterHealer(), CharacterTank()]
-
+    selectedPositions = []
+    x = 250
 
     def __init__(self, matchService):
         self.matchService = matchService
@@ -44,9 +45,15 @@ class SelectCharacters(BaseView):
         if self.indexCharacter in funCharacter:
             selectedCharacter = funCharacter[self.indexCharacter]
 
-        self.matchService.getPlayers()[self.indexPlayer].setCharacter(selectedCharacter)
-        self.indexesSprite[self.indexPlayer] = self.indexCharacter
-        self.indexPlayer += 1
+        if self.indexPlayer < len(self.matchService.getPlayers()):
+            self.matchService.getPlayers()[self.indexPlayer].setCharacter(selectedCharacter)
+            self.indexesSprite[self.indexPlayer] = self.indexCharacter
+
+            character = self.matchService.getPlayers()[self.indexPlayer].getCharacter()
+            self._drawImage(character.getSprite(), (250, 250), (self.x, 450))
+            self._drawButton(str(self.indexPlayer + 1), self._mainFont, 10, Colors.BLACK, (self.x + 100, 630), (40, 40))
+            self.x += 250
+            self.indexPlayer += 1
 
     def startMatch(self):
         try:
@@ -66,34 +73,29 @@ class SelectCharacters(BaseView):
 
     def run(self):
         self._setCaption("Match")
+        gameBarSize = (self._screenWidth, 220)
+        gameBarSurface = pygame.Surface(gameBarSize)
+        gameBarSurface.fill(Colors.CYAN)
+        self._screen.blit(gameBarSurface, (0, (self._screenHeight - gameBarSize[1])))
+        self._screen.fill(Colors.BLACK)
         while self._running:
-            self._screen.fill(Colors.BLACK)
-
-
-            self._drawBackground('./assets/champion-selection/background.gif')
 
             self._drawText('Seleção de Jogadores', self.fontSize + 2, self._mainFont, Colors.WHITE, (640, 50))
+            self._drawCharacter('./assets/champion-selection/background.gif', (1280, 500), (0, 0))
 
-            x = 150
-            for idx, player in enumerate(self.matchService.getPlayers()):
-                if idx == self.indexPlayer:
-                    self._drawCharacter(self.characters[self.indexCharacter].getSprite(), (250, 300), (x, 300))
-                    self._drawButton('<', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None,
-                                     self.previousCharacter)
-                    x += 76
-                    self._drawButton(str(player.getId() + 1), self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40),
-                                     None, self.selectCharacter)
-                    x += 76
-                    self._drawButton('>', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (x, 510), (48, 40), None,
-                                     self.nextCharacter)
-                    x += 210
-                else:
-                    self._drawCharacter(self.characters[self.indexesSprite[idx]].getSprite(), (200, 200), (x, 300))
-                    x += 362
 
-            self._drawButton('Iniciar partida', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (525, 600), (200, 50), None,
-                             self.startMatch)
-
+            if self.indexPlayer < len(self.matchService.getPlayers()):
+                self._drawCharacter(self.characters[self.indexCharacter].getSprite(), (350, 350), (450, 225))
+                self._drawButton('<', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (525, 460), (48, 40), None,
+                                 self.previousCharacter)
+                self._drawButton(str(1), self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (600, 460), (48, 40),
+                                 None, self.selectCharacter)
+                self._drawButton('>', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (675, 460), (48, 40), None,
+                                 self.nextCharacter)
+            else:
+                self._drawButton('Iniciar partida', self._mainFont, self.fontSize, Colors.LIGHT_GRAY, (525, 675),
+                                 (200, 50), None,
+                                 self.startMatch)
             self._event()
 
             pygame.display.update()
