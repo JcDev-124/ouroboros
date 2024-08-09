@@ -34,7 +34,7 @@ class MatchView(BaseView):
             
             self._screen.blit(gameBarSurface, (0, (self._screenHeight - gameBarSize[1])))
 
-            self.drawMiniature((200, 200), (0, 510), self.matchService.getAttackerIndex(), self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter().getSprite())
+            self._drawCharacter(self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter().getSprite(), (200, 200), (0, 510))
             self.drawHpPlayer((10, 680), (200, 20), self.matchService.getAttackerIndex())
             self.drawFighters()
             self.drawHPAllPlayers()
@@ -43,7 +43,7 @@ class MatchView(BaseView):
             elif self.matchService.getCurrentState() == states['selectingAttack']:
                 self.drawAttackOptions()
                 self.drawHpPlayer((self._screenWidth - 210, 680), (200, 20), self.indexDefender)
-                self.drawMiniature((200, 200), (self._screenWidth - 200, 510), self.indexDefender, self.matchService.getPlayers()[self.indexDefender].getCharacter().getSpriteRotate())
+                self._drawCharacter(self.matchService.getPlayers()[self.indexDefender].getCharacter().getSpriteRotate(), (200, 200), (self._screenWidth - 200, 510))
 
             elif self.matchService.getCurrentState() == states['waitingAnswer']:
                 self.drawQuestion()
@@ -84,11 +84,6 @@ class MatchView(BaseView):
         self._drawButton(attacker.getNameMediumAttack(), self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY), (buttonWidth, buttonHeight), None, self.setLevel,('normal', 'medium'))
         self._drawButton(attacker.getNameHeavyAttack(), self._mainFont, fontSize, Colors.BLACK, (centerX, startY + buttonHeight + verticalSpacing), (buttonWidth, buttonHeight), None, self.setLevel, ('hard', 'heavy'))
         self._drawButton(attacker.getNameUltimateAttack(), self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY + buttonHeight + verticalSpacing),(buttonWidth, buttonHeight), None, self.setLevel, ('ultimate', 'ultimate'))
-
-
-    def drawMiniature(self, size, pos, player, sprite):
-        self._drawCharacter(sprite, size, pos)
-
 
 
     def selectedDefender(self, indexDefender):
