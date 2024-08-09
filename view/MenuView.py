@@ -27,12 +27,15 @@ class MenuView(BaseView):
         self._quit()
 
     def run(self):
+        self._bg_frame_interval = 9
         while self._running:
             clock = pygame.time.Clock()
             fps = 60
 
             self._drawBackground('./assets/images/backgrounds/menuBackground.gif', (self._screenWidth, self._screenHeight), (0, 0))
+            self._drawImage('./assets/images/backgrounds/menuBlur.png', (708, 125), (286, 53))
             self._drawText('OuroBoros', 124, './assets/fonts/titleFont.ttf', Colors.WHITE, (self._screenWidth / 2, 115))
+
             self.drawOptions((280, 80))
 
             self._event()
@@ -44,7 +47,6 @@ class MenuView(BaseView):
     def drawOptions(self, optionSize):
         font = './assets/fonts/mainFont.ttf'
         fontSize = 28
-        fontOffset = (0, 3)
         image = './assets/images/buttons/menuButton.png'
 
         leftGap = 15
