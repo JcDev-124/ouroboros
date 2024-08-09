@@ -1,12 +1,25 @@
+import pygame
 from domain.characters.Character import Character
-
 
 class CharacterDamage(Character):
 
     def __init__(self):
         super().__init__("Hercules", 800, 0)
-        self.sprite = (f'./assets/images/characters/damage.gif')
-        self.spriteRotate = (f'./assets/images/characters/damageR.gif')
+
+        self.sprites = {
+            'idle': pygame.image.load(f'./assets/images/characters/damage/idle.png'),
+            'attack': pygame.image.load(f'./assets/images/characters/damage/attack1.png'),
+            'take_hit': pygame.image.load(f'./assets/images/characters/damage/take_hit.png'),
+            'death': pygame.image.load(f'./assets/images/characters/damage/death.png')
+        }
+
+        self.frame_counts = {
+            'idle': 10,
+            'attack': 7,
+            'take_hit': 3,
+            'death': 11
+        }
+
         self.nameLightAttack = "attack 1 - dano"
         self.nameMediumAttack = "attack 2 - dano"
         self.nameHeavyAttack = "attack 3 - dano"
@@ -26,7 +39,7 @@ class CharacterDamage(Character):
 
     def ult_attack(self, intensity, character):
         if not self.verify_ult():
-            raise ValueError("Ultimate nao disponivel")
+            raise ValueError("Ultimate não disponível")
 
         character._attack((120) * intensity)
         self.ult = 0

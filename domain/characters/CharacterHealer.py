@@ -1,14 +1,26 @@
+import pygame
 from domain.characters.Character import Character
-
 
 class CharacterHealer(Character):
 
     def __init__(self):
         super().__init__("Asclepio", 1000, 0)
-        self.sprite = (f'./assets/images/characters/healer.gif')
-        self.spriteRotate = (f'./assets/images/characters/healerR.gif')
 
-        self.nameHeavyAttack = "attack 1 - healer"
+        self.sprites = {
+            'idle': pygame.image.load(f'./assets/images/characters/healer/idle.png'),
+            'attack': pygame.image.load(f'./assets/images/characters/healer/attack1.png'),
+            'take_hit': pygame.image.load(f'./assets/images/characters/healer/take_hit.png'),
+            'death': pygame.image.load(f'./assets/images/characters/healer/death.png')
+        }
+
+        self.frame_counts = {
+            'idle': 10,
+            'attack': 13,
+            'take_hit': 3,
+            'death': 18
+        }
+
+        self.nameLightAttack = "attack 1 - healer"
         self.nameMediumAttack = "attack 2 - healer"
         self.nameHeavyAttack = "attack 3 - healer"
         self.nameUltimateAttack = "attack 4 - healer"
@@ -27,7 +39,7 @@ class CharacterHealer(Character):
 
     def ult_attack(self):
         if not self.verify_ult():
-            raise ValueError("Ultimate nao disponivel")
+            raise ValueError("Ultimate não disponível")
         if self.hp > (self._maxHpValue * 0.4):
             self.hp = self._maxHpValue
         else:

@@ -5,7 +5,6 @@ from service.MatchService import states
 from view.BaseView import BaseView
 from view.Colors import Colors
 
-
 class MatchView(BaseView):
     matchService = None
     indexAttacker = 0
@@ -16,56 +15,52 @@ class MatchView(BaseView):
 
     attackIntensity = 5
 
-    def __init__(self):
-        super().__init__()
-
-    def run(self, matchService):
-        clock = pygame.time.Clock()
-        fps = 60
+    def __init__(self, matchService):
         self.matchService = matchService
         self.matchService.startMatch()
+        super().__init__()
 
-        gameBarSize = (self._screenWidth, 220)
-        gameBarSurface = pygame.Surface(gameBarSize)
-
+    def run(self):
+        self._bg_frame_interval = 4
+        self._ch_frame_interval = 5
+        self.audio_manager.play_background_music('./assets/sounds/fight.ogg')
         while self._running:
-            self._screen.fill(Colors.BLACK)
-            gameBarSurface.fill(Colors.CYAN)
-            
-            self._screen.blit(gameBarSurface, (0, (self._screenHeight - gameBarSize[1])))
+            clock = pygame.time.Clock()
+            fps = 60
 
-            self._drawCharacter(self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter().getSprite(), (200, 200), (0, 510))
+            self._drawBackground('./assets/images/backgrounds/matchBackground.gif',
+                                 (self._screenWidth, 490), (0, 0))
+            self._drawImage('./assets/images/buttons/menuButton.png', (self._screenWidth, 230),
+                            (0, self._screenHeight - 230))
+
+            character = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+            self._drawCharacter(character, 'idle', (200, 200), (0, 510))
             self.drawHpPlayer((10, 680), (200, 20), self.matchService.getAttackerIndex())
             self.drawFighters()
             self.drawHPAllPlayers()
+
             if self.matchService.getCurrentState() == states['selectingDefender']:
                 self.drawDefenderOptions()
             elif self.matchService.getCurrentState() == states['selectingAttack']:
                 self.drawAttackOptions()
                 self.drawHpPlayer((self._screenWidth - 210, 680), (200, 20), self.indexDefender)
-                self._drawCharacter(self.matchService.getPlayers()[self.indexDefender].getCharacter().getSpriteRotate(), (200, 200), (self._screenWidth - 200, 510))
-
+                self._drawCharacter(self.matchService.getPlayers()[self.indexDefender].getCharacter(), 'idle',
+                                    (200, 200), (self._screenWidth - 200, 510))
             elif self.matchService.getCurrentState() == states['waitingAnswer']:
                 self.drawQuestion()
                 self._drawInputBox()
-
 
                 if self._insertedText != '':
                     print(self.validateAnswer())
                     self._insertedText = ''
                     self.questionReceived = None
-                else:
-                    pass
-
             elif self.matchService.getCurrentState() == states['attacking']:
                 self.attack()
 
-
-
             self._event()
+
             pygame.display.update()
             clock.tick(fps)
-        pygame.quit()
 
     def drawAttackOptions(self):
         fontSize = 14
@@ -80,10 +75,10 @@ class MatchView(BaseView):
         centerX = (gameBarSize[0] - (2 * buttonWidth + 20)) // 2
 
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-        self._drawButton(attacker.getNameLightAttack(), self._mainFont, fontSize, Colors.BLACK, (centerX, startY),(buttonWidth, buttonHeight), None, self.setLevel, ('easy', 'light'))
-        self._drawButton(attacker.getNameMediumAttack(), self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY), (buttonWidth, buttonHeight), None, self.setLevel,('normal', 'medium'))
-        self._drawButton(attacker.getNameHeavyAttack(), self._mainFont, fontSize, Colors.BLACK, (centerX, startY + buttonHeight + verticalSpacing), (buttonWidth, buttonHeight), None, self.setLevel, ('hard', 'heavy'))
-        self._drawButton(attacker.getNameUltimateAttack(), self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY + buttonHeight + verticalSpacing),(buttonWidth, buttonHeight), None, self.setLevel, ('ultimate', 'ultimate'))
+        self._drawButton(attacker.nameLightAttack, self._mainFont, fontSize, Colors.BLACK, (centerX, startY),(buttonWidth, buttonHeight), None, self.setLevel, ('easy', 'light'))
+        self._drawButton(attacker.nameMediumAttack, self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY), (buttonWidth, buttonHeight), None, self.setLevel,('normal', 'medium'))
+        self._drawButton(attacker.nameHeavyAttack, self._mainFont, fontSize, Colors.BLACK, (centerX, startY + buttonHeight + verticalSpacing), (buttonWidth, buttonHeight), None, self.setLevel, ('hard', 'heavy'))
+        self._drawButton(attacker.nameUltimateAttack, self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY + buttonHeight + verticalSpacing),(buttonWidth, buttonHeight), None, self.setLevel, ('ultimate', 'ultimate'))
 
 
     def selectedDefender(self, indexDefender):
@@ -103,15 +98,19 @@ class MatchView(BaseView):
             for i, player in enumerate(players):
                 if i != self.matchService.getAttackerIndex():
                     self._drawButton("", self._mainFont, 14, Colors.BLACK, (x, 510),
-                                     (150, 150), player.getCharacter().getSprite(), self.selectedDefender, i)
+                                     (150, 150), None, self.selectedDefender, i)
 
                     x += 160
 
     def drawFighters(self):
+        fightersSize = (680, 680)
+        offSet = -120
+        topGap = 0
+
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
-        self._drawCharacter(attacker.getSprite(), (200, 200), (300, 250))
-        self._drawCharacter(defender.getSpriteRotate(), (200, 200), (600, 250))
+        self._drawCharacter(attacker, 'idle', fightersSize, (offSet, topGap))
+        self._drawCharacter(defender, 'idle', fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap))
 
     def setLevel(self, level):
         print(level)
@@ -172,5 +171,3 @@ class MatchView(BaseView):
         textY = cord[1] + (size[1] - text_height) // 2
 
         self._screen.blit(textSurface, (textX, textY))
-
-

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import pygame
 
 
 class Character(ABC):
@@ -7,12 +8,24 @@ class Character(ABC):
         self.hp = hp
         self._maxHpValue = self.hp
         self.ult = ult
-        self.sprite = None
-        self.spriteRotate = None
-        self.nameLightAttack = None
-        self.nameMediumAttack = None
-        self.nameHeavyAttack = None
-        self.nameUltimateAttack = None
+
+        # Sprites and frame counts for different actions
+        self.sprites = {
+            'idle': None,
+            'attack': None,
+            'take_hit': None,
+            'death': None
+        }
+
+        self.frame_counts = {
+            'idle': 0,
+            'attack': 0,
+            'take_hit': 0,
+            'death': 0
+        }
+
+        self.current_frame = 0
+        self.current_action = 'idle'
 
     def _attack(self, dmg):
         self.hp -= dmg
@@ -27,20 +40,34 @@ class Character(ABC):
     def get_hp(self):
         return self.hp
 
-    def getSprite(self):
-        return self.sprite
+    def getNextSprite(self, action):
+        # Se a ação mudar, resete a contagem de frames para essa nova ação
+        if action != self.current_action:
+            self.current_action = action
+            self.current_frame = 0
 
-    def getSpriteRotate(self):
-        return self.spriteRotate
+        # Pegue a folha de sprites e o número de frames para a ação atual
+        sheet = self.sprites[self.current_action]
+        num_frames = self.frame_counts[self.current_action]
 
-    def getNameLightAttack(self):
-        return self.nameLightAttack
+        # Calcule a largura e altura de cada frame
+        frame_width = sheet.get_width() // num_frames
+        frame_height = sheet.get_height()
 
-    def getNameMediumAttack(self):
-        return self.nameMediumAttack
+        # Crie uma superfície para o frame atual
+        frame_surface = pygame.Surface((frame_width, frame_height), pygame.SRCALPHA)
 
-    def getNameHeavyAttack(self):
-        return self.nameHeavyAttack
+        # Copie o frame correspondente da folha de sprites para a superfície
+        frame_surface.blit(sheet, (0, 0), (self.current_frame * frame_width, 0, frame_width, frame_height))
 
-    def getNameUltimateAttack(self):
-        return self.nameUltimateAttack
+        # Atualize o contador de frames
+        self.current_frame += 1
+
+        # Se o contador de frames ultrapassar o número de frames disponíveis, volte ao início
+        if self.current_frame >= num_frames:
+            self.current_frame = 0
+
+        # Retorne o sprite correspondente à ação atual
+        return frame_surface
+
+

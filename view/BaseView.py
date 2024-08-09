@@ -4,6 +4,11 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Iterator, Optional
 from PIL import Image
+
+from domain.characters.CharacterTank import CharacterTank
+from domain.characters.CharacterHealer import CharacterHealer
+from domain.characters.CharacterDamage import CharacterDamage
+from view.AudioManager import AudioManager
 from view.Colors import Colors
 
 class BaseView(ABC):
@@ -22,6 +27,7 @@ class BaseView(ABC):
         self._mainFont = './assets/fonts/mainFont.ttf'
         pygame.display.set_caption("Ouroboros")
         pygame.display.set_icon(pygame.image.load('./assets/icons/favicon.png'))
+        self._character_shadow = './assets/images/characters/shadow.png'
 
         self._input_box = pygame.Rect(100, 100, 140, 32)  # Example position and size
         self._color_inactive = pygame.Color('lightskyblue3')
@@ -35,6 +41,11 @@ class BaseView(ABC):
         self._ch_frame_interval = 5
         self._pygame_image_bg = None
         self._pygame_images_char = {}
+
+        # audio
+        self.audio_manager = AudioManager()
+        self.audio_manager.load_sound_effect('click', './assets/sounds/confirm1.ogg')
+        self.audio_manager.play_background_music('./assets/sounds/background.ogg')
 
     def _event(self):
         for event in pygame.event.get():
@@ -85,7 +96,7 @@ class BaseView(ABC):
                 self._drawImage(image, size, coordinates)
             self.__drawButtonOverlay(size, coordinates)
             if click[0] == 1 and action is not None and not self._button_pressed:
-                self._playAudio('./assets/sounds/confirm1.ogg')
+                self.audio_manager.play_sound_effect('click')
                 if parameters is None:
                     action()
                 else:
@@ -142,22 +153,32 @@ class BaseView(ABC):
 
         self._frame_counter += 1
 
-    def _drawCharacter(self, directory, tam, pos):
-        if directory not in self._gif_frame_iterator_char:
-            self._gif_frame_iterator_char[directory] = self._gifFrameExtractor(directory)
+    def _drawCharacter(self, character, action, tam, pos):
+        character_id = id(character)
+
+        key = (character_id, action)
+
+        if key not in self._pygame_images_char:
+            self._pygame_images_char[key] = None
 
         if self._frame_counter % self._ch_frame_interval == 0:
-            frame = next(self._gif_frame_iterator_char[directory])
-            frame = frame.convert('RGBA')
+            frame = character.getNextSprite(action)
+            frame = frame.convert_alpha()
+            self._pygame_images_char[key] = frame
 
-            size = frame.size
-            data = frame.tobytes()
-            mode = frame.mode
+        if self._pygame_images_char[key] is not None:
+            self._screen.blit(pygame.transform.scale(self._pygame_images_char[key], tam), pos)
+            shadow_offset = 0.0
+            if isinstance(character, CharacterDamage):
+                shadow_offset = 0.56
+            elif isinstance(character, CharacterHealer):
+                shadow_offset = 0.58
+            elif isinstance(character, CharacterTank):
+                shadow_offset = 0.53
 
-            self._pygame_images_char[directory] = pygame.image.fromstring(data, size, mode)
-
-        if directory in self._pygame_images_char and self._pygame_images_char[directory] is not None:
-            self._screen.blit(pygame.transform.scale(self._pygame_images_char[directory], tam), pos)
+            shadow_size = (int(tam[0] * 0.85), int(tam[1] * 0.2))
+            shadow_pos = (pos[0] + ((tam[0] - shadow_size[0]) / 2), pos[1] + int(tam[1] * shadow_offset))
+            self._screen.blit(pygame.transform.scale(pygame.image.load(self._character_shadow), shadow_size), shadow_pos)
 
     def _gifFrameExtractor(self, gif_path: str) -> Iterator[Image.Image]:
         if not os.path.isfile(gif_path):
@@ -169,7 +190,3 @@ class BaseView(ABC):
             for frame in range(gif.n_frames):
                 gif.seek(frame)
                 yield gif.copy()
-
-    def _playAudio(self, audioDirectory):
-        pygame.mixer.music.load(audioDirectory)
-        pygame.mixer.music.play()

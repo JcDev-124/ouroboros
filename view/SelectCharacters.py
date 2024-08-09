@@ -15,6 +15,7 @@ class SelectCharacters(BaseView):
     fontSize = 16
     characters = [CharacterDamage(), CharacterHealer(), CharacterTank()]
     selectedPositions = []
+    teste = CharacterHealer()
     x = 250
 
     def __init__(self, matchService):
@@ -50,6 +51,7 @@ class SelectCharacters(BaseView):
             self.indexesSprite[self.indexPlayer] = self.indexCharacter
 
             self.indexPlayer += 1
+            self.indexCharacter = 0
 
     def startMatch(self):
         try:
@@ -58,7 +60,7 @@ class SelectCharacters(BaseView):
             self._drawText(e, self.fontSize + 2, self._mainFont, Colors.WHITE, (640, 50))
             return
 
-        MatchView().run(self.matchService)
+        MatchView(self.matchService).run()
         self._quit()
 
     def checkSelectedPlayers(self):
@@ -67,13 +69,12 @@ class SelectCharacters(BaseView):
             raise ValueError(message)
 
     def run(self):
-        self._bg_frame_interval = 8
-        self._ch_frame_interval = 3
+        self._bg_frame_interval = 9
+        self._ch_frame_interval = 5
         while self._running:
             clock = pygame.time.Clock()
             fps = 60
 
-            self._drawText('Seleção de Jogadores', self.fontSize + 2, self._mainFont, Colors.WHITE, (640, 50))
             self._drawBackground('./assets/images/backgrounds/characterSelectionBackground.gif', (self._screenWidth, 490), (0, 0))
             self._drawImage('./assets/images/buttons/menuButton.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
 
@@ -90,20 +91,18 @@ class SelectCharacters(BaseView):
 
     def drawCharacterOption(self, index):
         # change if needed
-        topGap = 270
-        miniatureSize = (200, 200)
+        topGap = 145
+        miniatureSize = (460, 460)
+
+        buttonSize = (45, 30)
         buttonGap = 10
-        buttonCorrection = 20
+        buttonTopOffset = 455
         buttonImage = './assets/images/buttons/menuButton.png'
 
-        # do not change
-        dynamicButtonSize = int(((miniatureSize[0] - (buttonGap * 2)) / 3))
-        buttonSize = (dynamicButtonSize, int(dynamicButtonSize) * 0.6)
-
         position = ((self._screenWidth / 2) - ((miniatureSize[0] / 2)), topGap)
-        buttonPosition = (position[0], position[1] + miniatureSize[1] - buttonCorrection)
+        buttonPosition = ((self._screenWidth / 2) - ((buttonSize[0] * 3) + (buttonGap * 2)) / 2, buttonTopOffset)
 
-        self._drawCharacter(self.characters[self.indexCharacter].getSprite(), miniatureSize, position)
+        self._drawCharacter(self.characters[self.indexCharacter], 'idle', miniatureSize, position)
         self._drawButton(u'\u2190', self._mainFont, self.fontSize, Colors.BLACK, buttonPosition, buttonSize, buttonImage, self.previousCharacter)
         buttonPosition = ((buttonPosition[0] + buttonSize[0] + buttonGap), buttonPosition[1])
         self._drawButton(str(index), self._mainFont, self.fontSize, Colors.BLACK, buttonPosition, buttonSize, buttonImage, self.selectCharacter)
@@ -113,7 +112,7 @@ class SelectCharacters(BaseView):
     def drawSelectedCharacters(self):
         # change if needed
         gapBetween = 10
-        miniatureSize = (180, 180)
+        miniatureSize = (280, 280)
         barSize = (self._screenWidth, 230)
 
         # fixed variables
@@ -129,7 +128,7 @@ class SelectCharacters(BaseView):
 
             character = players[i].getCharacter()
             if character:
-                self._drawCharacter(character.getSprite(), miniatureSize, position)
+                self._drawCharacter(character, 'idle', miniatureSize, position)
                 position = ((position[0] + gapBetween + miniatureSize[0]), position[1])
 
     def drawStartMatchButton(self):
