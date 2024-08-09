@@ -31,7 +31,7 @@ class MenuView(BaseView):
             clock = pygame.time.Clock()
             fps = 60
 
-            self._drawBackground('./assets/images/menu/menuBackgroud.gif')
+            self._drawBackground('./assets/images/backgrounds/menuBackground.gif', (self._screenWidth, self._screenHeight), (0, 0))
             self._drawText('OuroBoros', 124, './assets/fonts/titleFont.ttf', Colors.WHITE, (self._screenWidth / 2, 115))
             self.drawOptions((280, 80))
 
