@@ -12,4 +12,4 @@ class Colors:
     PURPLE = (128, 0, 128)
     PINK = (255, 192, 203)
     LIGHT_GRAY = (211, 211, 211)
-    DARK_GRAY = (169, 169, 169)
+    DARK_GRAY = (100, 100, 100)
