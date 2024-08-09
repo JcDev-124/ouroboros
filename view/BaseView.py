@@ -31,7 +31,8 @@ class BaseView(ABC):
         self._gif_frame_iterator_bg = None
         self._gif_frame_iterator_char = {}
         self._frame_counter = 0
-        self._frame_interval = 7
+        self._bg_frame_interval = 10
+        self._ch_frame_interval = 5
         self._pygame_image_bg = None
         self._pygame_images_char = {}
 
@@ -123,11 +124,11 @@ class BaseView(ABC):
         self._screen.blit(text_surface, (self._input_box.x + 5, self._input_box.y + 5))
         self._input_box.w = max(200, text_surface.get_width() + 10)
 
-    def _drawBackground(self, directory):
+    def _drawBackground(self, directory, tam, pos):
         if self._gif_frame_iterator_bg is None:
             self._gif_frame_iterator_bg = self._gifFrameExtractor(directory)
 
-        if self._frame_counter % self._frame_interval == 0:
+        if self._frame_counter % self._bg_frame_interval == 0:
             frame = next(self._gif_frame_iterator_bg)
             frame = frame.convert('RGBA')
             mode = frame.mode
@@ -137,7 +138,7 @@ class BaseView(ABC):
             self._pygame_image_bg = pygame.image.fromstring(data, size, mode)
 
         if self._pygame_image_bg is not None:
-            self._screen.blit(pygame.transform.scale(self._pygame_image_bg, (self._screenWidth, self._screenHeight)), (0, 0))
+            self._screen.blit(pygame.transform.scale(self._pygame_image_bg, tam), pos)
 
         self._frame_counter += 1
 
@@ -145,7 +146,7 @@ class BaseView(ABC):
         if directory not in self._gif_frame_iterator_char:
             self._gif_frame_iterator_char[directory] = self._gifFrameExtractor(directory)
 
-        if self._frame_counter % self._frame_interval == 0:
+        if self._frame_counter % self._ch_frame_interval == 0:
             frame = next(self._gif_frame_iterator_char[directory])
             frame = frame.convert('RGBA')
 
