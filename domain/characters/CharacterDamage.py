@@ -5,8 +5,8 @@ class CharacterDamage(Character):
 
     def __init__(self):
         super().__init__("Hercules", 800, 0)
-        self.sprite = (f'./assets/champion-selection/damage.gif')
-        self.spriteRotate = (f'./assets/champion-selection/damageRotate.gif')
+        self.sprite = (f'./assets/images/characters/damage.gif')
+        self.spriteRotate = (f'./assets/images/characters/damageR.gif')
         self.nameLightAttack = "attack 1 - dano"
         self.nameMediumAttack = "attack 2 - dano"
         self.nameHeavyAttack = "attack 3 - dano"
