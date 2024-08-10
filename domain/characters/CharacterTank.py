@@ -5,13 +5,14 @@ from domain.characters.Character import Character
 class CharacterTank(Character):
 
     def __init__(self):
-        super().__init__("Atlas", 1000, 0)
+        super().__init__("Atlas", 1500, 0)
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/tank/idle.png'),
             'attack': pygame.image.load(f'./assets/images/characters/tank/attack1.png'),
             'take_hit': pygame.image.load(f'./assets/images/characters/tank/take_hit.png'),
-            'death': pygame.image.load(f'./assets/images/characters/tank/death.png')
+            'death': pygame.image.load(f'./assets/images/characters/tank/death.png'),
+            'profile': pygame.image.load(f'./assets/images/characters/tank/profile.png')
         }
 
         self.frame_counts = {
@@ -26,24 +27,21 @@ class CharacterTank(Character):
         self.nameHeavyAttack = "attack 3 - tank"
         self.nameUltimateAttack = "attack 4 - tank"
 
-        self.shield = False
+        self.shield = True
 
     def light_attack(self, intensity, character):
         character._attack(20 * intensity)
-        self.setUlt(1)
         return
 
     def medium_attack(self, intensity, character):
         character._attack(30 * intensity)
-        self.setUlt(2)
         return
 
     def heavy_attack(self, intensity, character):
         character._attack(40 * intensity)
-        self.setUlt(3)
         return
 
-    def _attack(self, dmg, ult=0):
+    def _attack(self, dmg):
         if self.shield:
             self.shield = False
             raise ValueError("Ataque bloqueado")
@@ -52,5 +50,6 @@ class CharacterTank(Character):
     def ult_attack(self):
         if not self.verify_ult():
             raise ValueError("Ultimate não disponível")
+
         self.shield = True
         self.ult = 0

@@ -1,16 +1,18 @@
 import pygame
 from domain.characters.Character import Character
 
+
 class CharacterDamage(Character):
 
     def __init__(self):
-        super().__init__("Hercules", 1000, 0)
+        super().__init__("Hercules", 800, 0)
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/damage/idle.png'),
             'attack': pygame.image.load(f'./assets/images/characters/damage/attack1.png'),
             'take_hit': pygame.image.load(f'./assets/images/characters/damage/take_hit.png'),
-            'death': pygame.image.load(f'./assets/images/characters/damage/death.png')
+            'death': pygame.image.load(f'./assets/images/characters/damage/death.png'),
+            'profile': pygame.image.load(f'./assets/images/characters/damage/profile.png')
         }
 
         self.frame_counts = {
@@ -27,17 +29,14 @@ class CharacterDamage(Character):
 
     def light_attack(self, intensity, character):
         character._attack(30 * intensity)
-        self.setUlt(1)
         return
 
     def medium_attack(self, intensity, character):
         character._attack(45 * intensity)
-        self.setUlt(2)
         return
 
     def heavy_attack(self, intensity, character):
         character._attack(60 * intensity)
-        self.setUlt(3)
         return
 
     def ult_attack(self, intensity, character):
