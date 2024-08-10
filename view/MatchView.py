@@ -159,22 +159,23 @@ class MatchView(BaseView):
 
     def drawAttackOptions(self):
         fontSize = 14
-        buttonWidth, buttonHeight = 300, 70
-        verticalSpacing = 20
-        gameBarSize = (self._screenWidth, 220)
+        buttonSize = (340, 80)
+        gap = 10
+        buttonImage = './assets/images/ui/button.png'
 
-        gameBarPosY = self._screenHeight - gameBarSize[1]
+        totalWidth = (buttonSize[0] * 2) + gap
+        totalHeight = (buttonSize[1] * 2) + gap
 
-        startY = (gameBarSize[1] - (2 * buttonHeight + verticalSpacing)) // 2 + gameBarPosY
-
-        centerX = (gameBarSize[0] - (2 * buttonWidth + 20)) // 2
+        position = ((self._screenWidth - totalWidth) / 2, ((self._screenHeight - self.gameBarSize[1]) + (self.gameBarSize[1] - totalHeight) / 2))
 
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-        self._drawButton(attacker.nameLightAttack, self._mainFont, fontSize, Colors.BLACK, (centerX, startY),(buttonWidth, buttonHeight), None, self.setLevel, ('easy', 'light'))
-        self._drawButton(attacker.nameMediumAttack, self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY), (buttonWidth, buttonHeight), None, self.setLevel,('normal', 'medium'))
-        self._drawButton(attacker.nameHeavyAttack, self._mainFont, fontSize, Colors.BLACK, (centerX, startY + buttonHeight + verticalSpacing), (buttonWidth, buttonHeight), None, self.setLevel, ('hard', 'heavy'))
-        self._drawButton(attacker.nameUltimateAttack, self._mainFont, fontSize, Colors.BLACK,(centerX + buttonWidth + 20, startY + buttonHeight + verticalSpacing),(buttonWidth, buttonHeight), None, self.setLevel, ('ultimate', 'ultimate'))
-
+        self._drawButton(attacker.nameLightAttack, self._mainFont, fontSize, Colors.BLACK, position, buttonSize, buttonImage, self.setLevel, ('easy', 'light'))
+        position = (position[0] + buttonSize[0] + gap, position[1])
+        self._drawButton(attacker.nameMediumAttack, self._mainFont, fontSize, Colors.BLACK,position, buttonSize, buttonImage, self.setLevel,('normal', 'medium'))
+        position = (position[0] - buttonSize[0] - gap, position[1] + buttonSize[1] + gap)
+        self._drawButton(attacker.nameHeavyAttack, self._mainFont, fontSize, Colors.BLACK, position, buttonSize, buttonImage, self.setLevel, ('hard', 'heavy'))
+        position = (position[0] + buttonSize[0] + gap, position[1])
+        self._drawButton(attacker.nameUltimateAttack, self._mainFont, fontSize, Colors.BLACK,position,buttonSize, buttonImage, self.setLevel, ('ultimate', 'ultimate'))
 
     def selectedDefender(self, indexDefender):
         self.indexDefender = indexDefender
@@ -230,8 +231,6 @@ class MatchView(BaseView):
             question = Questions()
             self.questionReceived = question.get_question(self.questionLevel)
         self._drawText(self.questionReceived.question, 14, self._mainFont, Colors.WHITE, (200, 50))
-
-
 
     def attack(self):
         defenderPlayer = self.matchService.getPlayers()[self.indexDefender]
