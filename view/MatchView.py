@@ -181,6 +181,16 @@ class MatchView(BaseView):
         self.matchService.setCurrentState(states['selectingAttack'])
 
     def drawDefenderOptions(self):
+        # fixed values
+        buttonSize = (180, 180)
+        buttonBg = './assets/images/ui/characterBackground.png'
+        offset = 7
+        gap = 15
+
+        # do not change
+        imageSize = (buttonSize[0] - (offset * 2), buttonSize[1] - (offset * 2))
+        buttonCoordinates = ((self._screenWidth - ((buttonSize[0] + gap) * 2)) / 2, self._screenHeight - self.gameBarSize[1] + (self.gameBarSize[1] - buttonSize[1]) / 2)
+        imageCoordinates = (buttonCoordinates[0] + offset, buttonCoordinates[1] + offset)
         players = self.matchService.getPlayers()
 
         if len(players) == 2:
@@ -189,13 +199,14 @@ class MatchView(BaseView):
             else:
                 self.selectedDefender(0)
         else:
-            x = 350
             for i, player in enumerate(players):
                 if i != self.matchService.getAttackerIndex():
-                    self._drawButton("", self._mainFont, 14, Colors.BLACK, (x, 510),
-                                     (150, 150), None, self.selectedDefender, i)
-
-                    x += 160
+                    self._drawButton("", self._mainFont, 14, Colors.BLACK, buttonCoordinates,
+                                     buttonSize, buttonBg, self.selectedDefender, i)
+                    self._screen.blit(pygame.transform.scale(player.getCharacter().getProfileImage(), imageSize), imageCoordinates)
+                    self._drawText(str(players.index(player) + 1), 20, './assets/fonts/titleFont.ttf', Colors.BLACK, imageCoordinates, (10, 10))
+                    buttonCoordinates = (buttonCoordinates[0] + buttonSize[0] + gap, buttonCoordinates[1])
+                    imageCoordinates = (buttonCoordinates[0] + offset, buttonCoordinates[1] + offset)
 
     def drawFighters(self):
         fightersSize = (680, 680)
