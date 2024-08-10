@@ -161,18 +161,21 @@ class MatchView(BaseView):
         character = self.matchService.getPlayers()[player].getCharacter()
         maxHp = character._maxHpValue
         currentHp = character.hp
-        currentBarWidth = int((currentHp / maxHp) * size[0])
+
+        currentBarHeight = int((currentHp / maxHp) * size[1])
 
         pygame.draw.rect(self._screen, Colors.GRAY, (cord[0], cord[1], size[0], size[1]))
-        pygame.draw.rect(self._screen, Colors.RED, (cord[0], cord[1], currentBarWidth, size[1]))
 
-
+        pygame.draw.rect(self._screen, Colors.RED,
+                         (cord[0], cord[1] + (size[1] - currentBarHeight), size[0], currentBarHeight))
 
     def drawUltPlayer(self, cord, size, player):
         maxUlt = 5
         currentUlt = self.matchService.getPlayers()[player].getCharacter().getUlt()
 
-        currentBarWidth = int((currentUlt / maxUlt) * size[0])
+        currentBarHeight = int((currentUlt / maxUlt) * size[1])
 
         pygame.draw.rect(self._screen, Colors.GRAY, (cord[0], cord[1], size[0], size[1]))
-        pygame.draw.rect(self._screen, Colors.YELLOW, (cord[0], cord[1], currentBarWidth, size[1]))
+
+        pygame.draw.rect(self._screen, Colors.YELLOW,
+                         (cord[0], cord[1] + (size[1] - currentBarHeight), size[0], currentBarHeight))
