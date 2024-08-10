@@ -153,7 +153,7 @@ class BaseView(ABC):
 
         self._frame_counter += 1
 
-    def _drawCharacter(self, character, action, tam, pos):
+    def _drawCharacter(self, character, action, tam, pos, flip=False):
         character_id = id(character)
 
         key = (character_id, action)
@@ -167,7 +167,13 @@ class BaseView(ABC):
             self._pygame_images_char[key] = frame
 
         if self._pygame_images_char[key] is not None:
-            self._screen.blit(pygame.transform.scale(self._pygame_images_char[key], tam), pos)
+            image = pygame.transform.scale(self._pygame_images_char[key], tam)
+
+            if flip:
+                image = pygame.transform.flip(image, True, False)
+
+            self._screen.blit(image, pos)
+
             shadow_offset = 0.0
             if isinstance(character, CharacterDamage):
                 shadow_offset = 0.56
@@ -178,7 +184,8 @@ class BaseView(ABC):
 
             shadow_size = (int(tam[0] * 0.85), int(tam[1] * 0.2))
             shadow_pos = (pos[0] + ((tam[0] - shadow_size[0]) / 2), pos[1] + int(tam[1] * shadow_offset))
-            self._screen.blit(pygame.transform.scale(pygame.image.load(self._character_shadow), shadow_size), shadow_pos)
+            self._screen.blit(pygame.transform.scale(pygame.image.load(self._character_shadow), shadow_size),
+                              shadow_pos)
 
     def _gifFrameExtractor(self, gif_path: str) -> Iterator[Image.Image]:
         if not os.path.isfile(gif_path):
