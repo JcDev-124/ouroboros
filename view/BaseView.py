@@ -17,6 +17,7 @@ class BaseView(ABC):
         pygame.init()
         self._screenWidth = 1280
         self._screenHeight = 720
+        self._fps = 60
         self._screen = pygame.display.set_mode((self._screenWidth, self._screenHeight))
         self._running = True
         self._button_pressed = False

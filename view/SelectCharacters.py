@@ -7,7 +7,6 @@ from view.BaseView import BaseView
 from view.MatchView import MatchView
 from view.Colors import Colors
 
-
 class SelectCharacters(BaseView):
     indexPlayer = 0
     indexCharacter = 0
@@ -73,7 +72,6 @@ class SelectCharacters(BaseView):
         self._ch_frame_interval = 5
         while self._running:
             clock = pygame.time.Clock()
-            fps = 60
 
             self._drawBackground('./assets/images/backgrounds/characterSelectionBackground.gif', (self._screenWidth, 490), (0, 0))
             self._drawImage('./assets/images/buttons/menuButton.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
@@ -84,10 +82,11 @@ class SelectCharacters(BaseView):
                 self.drawStartMatchButton()
 
             self.drawSelectedCharacters()
+
             self._event()
 
             pygame.display.update()
-            clock.tick(fps)
+            clock.tick(self._fps)
 
     def drawCharacterOption(self, index):
         # change if needed

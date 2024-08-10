@@ -26,7 +26,6 @@ class MatchView(BaseView):
         self.audio_manager.play_background_music('./assets/sounds/fight.ogg')
         while self._running:
             clock = pygame.time.Clock()
-            fps = 60
 
             self._drawBackground('./assets/images/backgrounds/matchBackground.gif',
                                  (self._screenWidth, 490), (0, 0))
@@ -61,10 +60,11 @@ class MatchView(BaseView):
 
             if self.matchService.gameFinished():
                 self._quit()
+
             self._event()
 
             pygame.display.update()
-            clock.tick(fps)
+            clock.tick(self._fps)
 
     def drawAttackOptions(self):
         fontSize = 14

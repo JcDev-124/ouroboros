@@ -30,7 +30,6 @@ class MenuView(BaseView):
         self._bg_frame_interval = 9
         while self._running:
             clock = pygame.time.Clock()
-            fps = 60
 
             self._drawBackground('./assets/images/backgrounds/menuBackground.gif', (self._screenWidth, self._screenHeight), (0, 0))
             self._drawImage('./assets/images/backgrounds/menuBlur.png', (708, 125), (286, 53))
@@ -39,8 +38,9 @@ class MenuView(BaseView):
             self.drawOptions((280, 80))
 
             self._event()
+
             pygame.display.update()
-            clock.tick(fps)
+            clock.tick(self._fps)
 
         pygame.quit()
 
