@@ -26,8 +26,8 @@ class MatchView(BaseView):
         super().__init__()
 
     def run(self):
-        self._bg_frame_interval = 4
-        self._ch_frame_interval = 5
+        self._bg_frame_interval = 3
+        self._ch_frame_interval = 3
         self.audio_manager.play_background_music('./assets/sounds/fight.ogg')
 
         # design constants
@@ -41,7 +41,10 @@ class MatchView(BaseView):
                                  (self._screenWidth, 490), (0, 0))
 
             # game bar elements
-            self._drawImage('./assets/images/ui/button.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
+            self._drawImage('./assets/images/ui/gameBar.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
+            self._drawImage('./assets/images/ui/transition.png', (self._screenWidth, 26),
+                            (0, self._screenHeight - (230 + 25)))
+
             self.drawPlayersMiniature()
             self.drawPlayersStats()
 
