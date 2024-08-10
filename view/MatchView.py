@@ -216,7 +216,8 @@ class MatchView(BaseView):
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
         self._drawCharacter(attacker, 'idle', fightersSize, (offSet, topGap))
-        self._drawCharacter(defender, 'idle', fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap), True)
+        if self.matchService.getCurrentState() != states['selectingDefender']:
+            self._drawCharacter(defender, 'idle', fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap), True)
 
     def setLevel(self, level):
         print(level)
