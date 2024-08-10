@@ -28,14 +28,17 @@ class CharacterHealer(Character):
 
     def light_attack(self, intensity, character):
         character._attack(10 * intensity)
+        self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
         character._attack(20 * intensity)
+        self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
         character._attack(30 * intensity)
+        self.addUltPoints(3)
         return
 
     def ult_attack(self):

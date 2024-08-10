@@ -31,17 +31,20 @@ class CharacterTank(Character):
 
     def light_attack(self, intensity, character):
         character._attack(20 * intensity)
+        self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
         character._attack(30 * intensity)
+        self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
         character._attack(40 * intensity)
+        self.addUltPoints(3)
         return
 
-    def _attack(self, dmg):
+    def _attack(self, dmg, ult=0):
         if self.shield:
             self.shield = False
             raise ValueError("Ataque bloqueado")
@@ -50,6 +53,5 @@ class CharacterTank(Character):
     def ult_attack(self):
         if not self.verify_ult():
             raise ValueError("Ultimate não disponível")
-
         self.shield = True
         self.ult = 0

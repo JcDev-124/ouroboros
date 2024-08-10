@@ -44,6 +44,18 @@ class Character(ABC):
     def get_hp(self):
         return self.hp
 
+    def punish(self, value):
+        if value > self.ult:
+            self.ult = 0
+        else:
+            self.ult -= value
+
+    def addUltPoints(self, value):
+        if self.ult + value > 5:
+            self.ult = 5
+        else:
+            self.ult += value
+
     def getNextSprite(self, action):
         if action == 'profile':
             return None
