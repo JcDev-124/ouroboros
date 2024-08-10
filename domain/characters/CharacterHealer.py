@@ -4,7 +4,7 @@ from domain.characters.Character import Character
 class CharacterHealer(Character):
 
     def __init__(self):
-        super().__init__("Asclepio", 1000, 0)
+        super().__init__("Asclepio", 1000, 0, 50)
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/healer/idle.png'),
@@ -27,16 +27,22 @@ class CharacterHealer(Character):
         self.nameUltimateAttack = "attack 4 - healer"
 
     def light_attack(self, intensity, character):
+        if self.hasLuck():
+            intensity = intensity * 2
         character._attack(10 * intensity)
         self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
+        if self.hasLuck():
+            intensity = intensity * 2
         character._attack(20 * intensity)
         self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
+        if self.hasLuck():
+            intensity = intensity * 2
         character._attack(30 * intensity)
         self.addUltPoints(3)
         return

@@ -1,13 +1,15 @@
+import random
 from abc import ABC, abstractmethod
 import pygame
 
 
 class Character(ABC):
-    def __init__(self, name, hp, ult):
+    def __init__(self, name, hp, ult, luck):
         self.name = name
         self.hp = hp
         self._maxHpValue = self.hp
         self.ult = ult
+        self.luck = luck
 
         # sprites
         self.sprites = {
@@ -55,6 +57,10 @@ class Character(ABC):
             self.ult = 5
         else:
             self.ult += value
+
+    def hasLuck(self):
+        chance = random.randint(0, 100)
+        return chance <= self.luck
 
     def getNextSprite(self, action):
         if action == 'profile':

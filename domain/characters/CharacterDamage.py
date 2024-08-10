@@ -5,7 +5,7 @@ from domain.characters.Character import Character
 class CharacterDamage(Character):
 
     def __init__(self):
-        super().__init__("Hercules", 800, 0)
+        super().__init__("Hercules", 800, 0, 10)
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/damage/idle.png'),
@@ -28,16 +28,22 @@ class CharacterDamage(Character):
         self.nameUltimateAttack = "attack 4 - dano"
 
     def light_attack(self, intensity, character):
+        if self.hasLuck():
+            intensity = intensity * 2
         character._attack(30 * intensity)
         self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
+        if self.hasLuck():
+            intensity = intensity * 2
         character._attack(45 * intensity)
         self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
+        if self.hasLuck():
+            intensity = intensity * 2
         character._attack(60 * intensity)
         self.addUltPoints(3)
         return
