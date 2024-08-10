@@ -34,12 +34,25 @@ class Character(ABC):
     def verify_ult(self):
         return self.ult > 3
 
+    def getUlt(self):
+        return self.ult
+
     def is_alive(self):
         return self.hp > 0
 
     def get_hp(self):
         return self.hp
 
+    def punish(self, value):
+        if value > self.ult:
+            self.ult = 0
+        else:
+            self.ult -= value
+    def setUlt(self, value):
+        if self.ult + value > 5:
+            self.ult = 5
+        else:
+            self.ult += value
     def getNextSprite(self, action):
         # Se a ação mudar, resete a contagem de frames para essa nova ação
         if action != self.current_action:
