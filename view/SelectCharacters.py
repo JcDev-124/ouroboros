@@ -74,7 +74,9 @@ class SelectCharacters(BaseView):
             clock = pygame.time.Clock()
 
             self._drawBackground('./assets/images/backgrounds/characterSelectionBackground.gif', (self._screenWidth, 490), (0, 0))
-            self._drawImage('./assets/images/ui/button.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
+            self._drawImage('./assets/images/ui/gameBar.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
+            self._drawImage('./assets/images/ui/transition.png', (self._screenWidth, 26),
+                            (0, self._screenHeight - (230 + 25)))
 
             if self.indexPlayer < len(self.matchService.getPlayers()):
                 self.drawCharacterOption(self.indexPlayer + 1)
@@ -90,16 +92,18 @@ class SelectCharacters(BaseView):
 
     def drawCharacterOption(self, index):
         # change if needed
-        topGap = 145
-        miniatureSize = (460, 460)
+        leftOffset = -30
+        topGap = 20
+        miniatureSize = (650, 650)
 
-        buttonSize = (45, 30)
+        buttonSize = (65, 45)
         buttonGap = 10
-        buttonTopOffset = 455
+        buttonTopOffset = 425
+        buttonLeftOffset = -15
         buttonImage = './assets/images/ui/button.png'
 
-        position = ((self._screenWidth / 2) - ((miniatureSize[0] / 2)), topGap)
-        buttonPosition = ((self._screenWidth / 2) - ((buttonSize[0] * 3) + (buttonGap * 2)) / 2, buttonTopOffset)
+        position = (leftOffset + (self._screenWidth / 2) - ((miniatureSize[0] / 2)), topGap)
+        buttonPosition = (buttonLeftOffset + (self._screenWidth / 2) - ((buttonSize[0] * 3) + (buttonGap * 2)) / 2, buttonTopOffset)
 
         self._drawCharacter(self.characters[self.indexCharacter], 'idle', miniatureSize, position)
         self._drawButton(u'\u2190', self._mainFont, self.fontSize, Colors.BLACK, buttonPosition, buttonSize, buttonImage, self.previousCharacter)
@@ -110,16 +114,19 @@ class SelectCharacters(BaseView):
 
     def drawSelectedCharacters(self):
         # change if needed
-        gapBetween = 10
-        miniatureSize = (280, 280)
+        gapBetween = 20
+        miniatureSize = (200, 200)
         barSize = (self._screenWidth, 230)
+        imageOffset = 15
 
         # fixed variables
+        imageSize = (miniatureSize[0] - (imageOffset * 2), miniatureSize[1] - (imageOffset * 2))
         players = self.matchService.getPlayers()
         numberOfPlayers = len(players)
 
         totalWidth = (numberOfPlayers * miniatureSize[0]) + ((numberOfPlayers - 1) * gapBetween)
         position = ((self._screenWidth - totalWidth) / 2, (self._screenHeight - barSize[1] + ((barSize[1] - miniatureSize[1]) / 2)))
+        imagePosition = (position[0] + imageOffset, position[1] + imageOffset)
 
         for i in range(numberOfPlayers):
             if i > self.indexPlayer:
@@ -127,14 +134,17 @@ class SelectCharacters(BaseView):
 
             character = players[i].getCharacter()
             if character:
-                self._drawCharacter(character, 'idle', miniatureSize, position)
+                self._drawImage('./assets/images/ui/characterBackground.png', miniatureSize, position)
+                self._screen.blit(pygame.transform.scale(character.getProfileImage(), imageSize), imagePosition)
+                self._drawText(str(i + 1), 20, './assets/fonts/titleFont.ttf', Colors.BLACK, imagePosition, (10, 10))
                 position = ((position[0] + gapBetween + miniatureSize[0]), position[1])
+                imagePosition = (position[0] + imageOffset, position[1] + imageOffset)
 
     def drawStartMatchButton(self):
         # change if needed
         offSet = -15
-        topGap = 418
-        buttonSize = (160, 55)
+        topGap = 415
+        buttonSize = (180, 60)
         buttonImage = './assets/images/ui/button.png'
 
         # do not change
