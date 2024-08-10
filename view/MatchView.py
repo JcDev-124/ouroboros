@@ -13,6 +13,11 @@ class MatchView(BaseView):
     attackLevel = None
     questionReceived = None
 
+    # design constants
+    gameBarSize = None
+    characterBgSize = None
+
+    # game constants
     attackIntensity = 5
 
     def __init__(self, matchService):
@@ -24,6 +29,11 @@ class MatchView(BaseView):
         self._bg_frame_interval = 4
         self._ch_frame_interval = 5
         self.audio_manager.play_background_music('./assets/sounds/fight.ogg')
+
+        # design constants
+        self.gameBarSize = (self._screenWidth, 230)
+        self.characterBgSize = (200, 200)
+
         while self._running:
             clock = pygame.time.Clock()
 
@@ -32,8 +42,8 @@ class MatchView(BaseView):
             self._drawImage('./assets/images/buttons/menuButton.png', (self._screenWidth, 230),
                             (0, self._screenHeight - 230))
 
-            character = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-            self._drawCharacter(character, 'idle', (200, 200), (0, 520))
+            self.drawPlayersMiniature()
+
             self.drawHpPlayer((230, 520), (20, 170), self.matchService.getAttackerIndex())
             self.drawUltPlayer((210, 520), (20, 170), self.matchService.getAttackerIndex())
             self.drawFighters()
@@ -44,8 +54,6 @@ class MatchView(BaseView):
             elif self.matchService.getCurrentState() == states['selectingAttack']:
                 self.drawAttackOptions()
                 self.drawHpPlayer((self._screenWidth - 230, 520), (20, 170), self.indexDefender)
-                self._drawCharacter(self.matchService.getPlayers()[self.indexDefender].getCharacter(), 'idle',
-                                    (200, 200), (self._screenWidth - 200, 520), True)
                 self.drawUltPlayer((self._screenWidth - 210, 520), (20, 170), self.indexDefender)
 
             elif self.matchService.getCurrentState() == states['waitingAnswer']:
@@ -65,6 +73,25 @@ class MatchView(BaseView):
 
             pygame.display.update()
             clock.tick(self._fps)
+
+    def drawPlayersMiniature(self):
+        # fixed values
+        bgOffset = (self.gameBarSize[1] - self.characterBgSize[1]) / 2
+        chOffset = 10
+        miniatureSize = (self.characterBgSize[0] - (chOffset * 2), self.characterBgSize[1] - (chOffset * 2))
+
+        # attacker
+        self._drawImage('./assets/images/backgrounds/characterBackground.png', self.characterBgSize, (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
+        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        coordinates = (chOffset + bgOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
+        self._screen.blit(pygame.transform.scale(attacker.getProfileImage(), miniatureSize), coordinates)
+
+        # defender
+        if self.matchService.getCurrentState() == states['selectingAttack']:
+            self._drawImage('./assets/images/backgrounds/characterBackground.png', self.characterBgSize, (self._screenWidth - self.characterBgSize[0] - bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
+            defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
+            coordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset + chOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
+            self._screen.blit(pygame.transform.scale(defender.getProfileImage(), miniatureSize), coordinates)
 
     def drawAttackOptions(self):
         fontSize = 14
