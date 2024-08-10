@@ -1,6 +1,6 @@
 import random
-
 from domain.characters.CharacterDamage import CharacterDamage
+from domain.questions.Question import Question
 
 states = {
     'selectingDefender': 1,
@@ -37,14 +37,19 @@ class MatchService:
 
         self.attacker = random.choice(self.players)
 
-    def attack(self, level, damage, defender):
+    def validateAnswer(self, question, answer, damage, defender, punish, typeAttack):
+        if question.validate_answer(answer):
+            typeAttack(damage, defender.getCharacter())
+        else:
+            self.attacker.getCharacter().punish(punish)
+    def attack(self, level, damage, defender, question, answer):
         try:
             if level == 'light':
-                self.attacker.getCharacter().light_attack(damage, defender.getCharacter())
+                self.validateAnswer(question, answer, damage, defender, 5, self.attacker.getCharacter().light_attack)
             elif level == 'medium':
-                self.attacker.getCharacter().medium_attack(damage, defender.getCharacter())
+                self.validateAnswer(question, answer, damage, defender, 3, self.attacker.getCharacter().medium_attack)
             elif level == 'heavy':
-                self.attacker.getCharacter().heavy_attack(damage, defender.getCharacter())
+                self.validateAnswer(question, answer, damage, defender, 2, self.attacker.getCharacter().heavy_attack)
             elif level == 'ultimate':
                 if type(self.attacker.getCharacter()) is CharacterDamage:
                     self.attacker.getCharacter().ult_attack(damage, defender.getCharacter())
@@ -69,6 +74,8 @@ class MatchService:
         return self.currentState
 
     def getAttackerIndex(self):
+        if self.attacker not in self.players:
+            self.attacker = random.choice(self.players)
         return self.players.index(self.attacker)
 
     def __setNextAttacker(self):
@@ -83,3 +90,6 @@ class MatchService:
         for player in self.players:
             if player.getCharacter().get_hp() <= 0:
                 self.players.remove(player)
+
+    def gameFinished(self):
+        return len(self.players) == 1
