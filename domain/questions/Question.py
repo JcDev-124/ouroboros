@@ -11,7 +11,7 @@ class Question:
         functionService = FunctionService()
 
         if isinstance(self.answer, int):
-            return int(user_answer) == self.answer
+            return str(user_answer) == str(self.answer)
 
         function_map = {
             'sum': functionService.sum,
