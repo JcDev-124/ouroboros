@@ -84,17 +84,23 @@ class MatchView(BaseView):
         miniatureSize = (self.characterBgSize[0] - (chOffset * 2), self.characterBgSize[1] - (chOffset * 2))
 
         # attacker
-        self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
-        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        players = self.matchService.getPlayers()
+        imageCoordinates = (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1]))
+        self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, imageCoordinates)
+        attacker = players[self.matchService.getAttackerIndex()].getCharacter()
         coordinates = (chOffset + bgOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
         self._screen.blit(pygame.transform.scale(attacker.getProfileImage(), miniatureSize), coordinates)
+        self._drawText(str(self.matchService.getAttackerIndex() + 1), 25, './assets/fonts/titleFont.ttf', Colors.BLACK, imageCoordinates, (20, 20))
 
         # defender
         if self.matchService.getCurrentState() == states['selectingAttack']:
-            self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, (self._screenWidth - self.characterBgSize[0] - bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
+            imageCoordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1]))
+            self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, imageCoordinates)
             defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
             coordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset + chOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
             self._screen.blit(pygame.transform.scale(defender.getProfileImage(), miniatureSize), coordinates)
+            self._drawText(str(self.indexDefender + 1), 25, './assets/fonts/titleFont.ttf',
+                           Colors.BLACK, imageCoordinates, (20, 20))
 
     def drawPlayersStats(self):
         gap = 6
