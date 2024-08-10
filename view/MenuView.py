@@ -47,7 +47,7 @@ class MenuView(BaseView):
     def drawOptions(self, optionSize):
         font = './assets/fonts/mainFont.ttf'
         fontSize = 28
-        image = './assets/images/buttons/menuButton.png'
+        image = './assets/images/ui/button.png'
 
         leftGap = 15
         betweenGap = 10

@@ -74,7 +74,7 @@ class SelectCharacters(BaseView):
             clock = pygame.time.Clock()
 
             self._drawBackground('./assets/images/backgrounds/characterSelectionBackground.gif', (self._screenWidth, 490), (0, 0))
-            self._drawImage('./assets/images/buttons/menuButton.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
+            self._drawImage('./assets/images/ui/button.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
 
             if self.indexPlayer < len(self.matchService.getPlayers()):
                 self.drawCharacterOption(self.indexPlayer + 1)
@@ -96,7 +96,7 @@ class SelectCharacters(BaseView):
         buttonSize = (45, 30)
         buttonGap = 10
         buttonTopOffset = 455
-        buttonImage = './assets/images/buttons/menuButton.png'
+        buttonImage = './assets/images/ui/button.png'
 
         position = ((self._screenWidth / 2) - ((miniatureSize[0] / 2)), topGap)
         buttonPosition = ((self._screenWidth / 2) - ((buttonSize[0] * 3) + (buttonGap * 2)) / 2, buttonTopOffset)
@@ -135,7 +135,7 @@ class SelectCharacters(BaseView):
         offSet = -15
         topGap = 418
         buttonSize = (160, 55)
-        buttonImage = './assets/images/buttons/menuButton.png'
+        buttonImage = './assets/images/ui/button.png'
 
         # do not change
         position = ((self._screenWidth / 2) - (buttonSize[0] / 2) + offSet, topGap)

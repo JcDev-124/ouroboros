@@ -39,7 +39,7 @@ class MatchView(BaseView):
 
             self._drawBackground('./assets/images/backgrounds/matchBackground.gif',
                                  (self._screenWidth, 490), (0, 0))
-            self._drawImage('./assets/images/buttons/menuButton.png', (self._screenWidth, 230),
+            self._drawImage('./assets/images/ui/button.png', (self._screenWidth, 230),
                             (0, self._screenHeight - 230))
 
             self.drawPlayersMiniature()
