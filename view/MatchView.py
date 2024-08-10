@@ -39,23 +39,23 @@ class MatchView(BaseView):
 
             self._drawBackground('./assets/images/backgrounds/matchBackground.gif',
                                  (self._screenWidth, 490), (0, 0))
-            self._drawImage('./assets/images/ui/button.png', (self._screenWidth, 230),
-                            (0, self._screenHeight - 230))
 
+            # game bar elements
+            self._drawImage('./assets/images/ui/button.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
             self.drawPlayersMiniature()
+            self.drawPlayersStats()
 
-            self.drawHpPlayer((230, 520), (20, 170), self.matchService.getAttackerIndex())
-            self.drawUltPlayer((210, 520), (20, 170), self.matchService.getAttackerIndex())
+            # fighters
             self.drawFighters()
+
+            # stats overlay
             self.drawHPAllPlayers()
 
+            # options
             if self.matchService.getCurrentState() == states['selectingDefender']:
                 self.drawDefenderOptions()
             elif self.matchService.getCurrentState() == states['selectingAttack']:
                 self.drawAttackOptions()
-                self.drawHpPlayer((self._screenWidth - 230, 520), (20, 170), self.indexDefender)
-                self.drawUltPlayer((self._screenWidth - 210, 520), (20, 170), self.indexDefender)
-
             elif self.matchService.getCurrentState() == states['waitingAnswer']:
                 self.drawQuestion()
                 self._drawInputBox()
@@ -81,17 +81,78 @@ class MatchView(BaseView):
         miniatureSize = (self.characterBgSize[0] - (chOffset * 2), self.characterBgSize[1] - (chOffset * 2))
 
         # attacker
-        self._drawImage('./assets/images/backgrounds/characterBackground.png', self.characterBgSize, (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
+        self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         coordinates = (chOffset + bgOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
         self._screen.blit(pygame.transform.scale(attacker.getProfileImage(), miniatureSize), coordinates)
 
         # defender
         if self.matchService.getCurrentState() == states['selectingAttack']:
-            self._drawImage('./assets/images/backgrounds/characterBackground.png', self.characterBgSize, (self._screenWidth - self.characterBgSize[0] - bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
+            self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, (self._screenWidth - self.characterBgSize[0] - bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1])))
             defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
             coordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset + chOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
             self._screen.blit(pygame.transform.scale(defender.getProfileImage(), miniatureSize), coordinates)
+
+    def drawPlayersStats(self):
+        gap = 6
+
+        # do not change
+        imageSize = (26, (self.characterBgSize[1]))
+        barSize = (int(imageSize[0] * 0.775), int(imageSize[1] * 0.885))
+        barTopOffset = 3
+        offset = int((self.gameBarSize[1] - self.characterBgSize[1]) / 2)
+
+        # attacker
+        # ult
+        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        maxUlt = 5
+        currentUlt = attacker.getUlt()
+        currentBarHeight = int((currentUlt / maxUlt) * barSize[1])
+
+        coordinates = ((self.characterBgSize[0] + offset + gap), (offset + (self._screenHeight - self.gameBarSize[1])))
+        fillCoordinates = (coordinates[0] + int((imageSize[0] - barSize[0]) / 2), (coordinates[1] + barTopOffset))
+        pygame.draw.rect(self._screen, Colors.BG_BAR, (fillCoordinates[0], fillCoordinates[1], barSize[0], barSize[1]))
+        pygame.draw.rect(self._screen, Colors.ULT_BAR, (fillCoordinates[0], fillCoordinates[1] + (barSize[1] - currentBarHeight), barSize[0], currentBarHeight))
+        self._drawImage('./assets/images/ui/ultBar.png', imageSize, coordinates)
+
+        # hp
+        maxHp = attacker._maxHpValue
+        currentHp = attacker.get_hp()
+        currentBarHeight = int((currentHp / maxHp) * barSize[1])
+
+        coordinates = (coordinates[0] + imageSize[0] + int(gap / 2), coordinates[1])
+        fillCoordinates = (coordinates[0] + int((imageSize[0] - barSize[0]) / 2), (coordinates[1] + barTopOffset))
+        pygame.draw.rect(self._screen, Colors.BG_BAR, (fillCoordinates[0], fillCoordinates[1], barSize[0], barSize[1]))
+        pygame.draw.rect(self._screen, Colors.HP_BAR, (fillCoordinates[0], fillCoordinates[1] + (barSize[1] - currentBarHeight), barSize[0], currentBarHeight))
+        self._drawImage('./assets/images/ui/hpBar.png', imageSize, coordinates)
+
+        # defender
+        if self.matchService.getCurrentState() == states['selectingAttack']:
+            # ult
+            defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
+            maxUlt = 5
+            currentUlt = defender.getUlt()
+            currentBarHeight = int((currentUlt / maxUlt) * barSize[1])
+
+            coordinates = ((self._screenWidth - (self.characterBgSize[0] + offset + gap + imageSize[0])), (offset + (self._screenHeight - self.gameBarSize[1])))
+            fillCoordinates = (coordinates[0] + int((imageSize[0] - barSize[0]) / 2), (coordinates[1] + barTopOffset))
+            pygame.draw.rect(self._screen, Colors.BG_BAR,
+                             (fillCoordinates[0], fillCoordinates[1], barSize[0], barSize[1]))
+            pygame.draw.rect(self._screen, Colors.ULT_BAR, (
+            fillCoordinates[0], fillCoordinates[1] + (barSize[1] - currentBarHeight), barSize[0], currentBarHeight))
+            self._drawImage('./assets/images/ui/ultBar.png', imageSize, coordinates)
+
+            maxHp = defender._maxHpValue
+            currentHp = defender.get_hp()
+            currentBarHeight = int((currentHp / maxHp) * barSize[1])
+
+            coordinates = (coordinates[0] - (imageSize[0] + int(gap / 2)), coordinates[1])
+            fillCoordinates = (coordinates[0] + int((imageSize[0] - barSize[0]) / 2), (coordinates[1] + barTopOffset))
+            pygame.draw.rect(self._screen, Colors.BG_BAR,
+                             (fillCoordinates[0], fillCoordinates[1], barSize[0], barSize[1]))
+            pygame.draw.rect(self._screen, Colors.HP_BAR, (
+            fillCoordinates[0], fillCoordinates[1] + (barSize[1] - currentBarHeight), barSize[0], currentBarHeight))
+            self._drawImage('./assets/images/ui/hpBar.png', imageSize, coordinates)
 
     def drawAttackOptions(self):
         fontSize = 14

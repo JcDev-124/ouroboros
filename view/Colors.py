@@ -1,4 +1,7 @@
 class Colors:
+    HP_BAR = (207, 12, 22)
+    ULT_BAR = (230, 216, 30)
+    BG_BAR = (55, 55, 55)
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     GRAY = (100, 100, 100)

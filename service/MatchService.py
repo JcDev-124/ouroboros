@@ -42,6 +42,7 @@ class MatchService:
             typeAttack(damage, defender.getCharacter())
         else:
             self.attacker.getCharacter().punish(punish)
+
     def attack(self, level, damage, defender, question, answer):
         try:
             if level == 'light':
