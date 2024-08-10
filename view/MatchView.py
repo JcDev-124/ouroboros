@@ -34,8 +34,9 @@ class MatchView(BaseView):
                             (0, self._screenHeight - 230))
 
             character = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-            self._drawCharacter(character, 'idle', (200, 200), (0, 510))
-            self.drawHpPlayer((10, 680), (200, 20), self.matchService.getAttackerIndex())
+            self._drawCharacter(character, 'idle', (200, 200), (0, 520))
+            self.drawHpPlayer((230, 520), (20, 170), self.matchService.getAttackerIndex())
+            self.drawUltPlayer((210, 520), (20, 170), self.matchService.getAttackerIndex())
             self.drawFighters()
             self.drawHPAllPlayers()
 
@@ -43,20 +44,23 @@ class MatchView(BaseView):
                 self.drawDefenderOptions()
             elif self.matchService.getCurrentState() == states['selectingAttack']:
                 self.drawAttackOptions()
-                self.drawHpPlayer((self._screenWidth - 210, 680), (200, 20), self.indexDefender)
+                self.drawHpPlayer((self._screenWidth - 230, 520), (20, 170), self.indexDefender)
                 self._drawCharacter(self.matchService.getPlayers()[self.indexDefender].getCharacter(), 'idle',
-                                    (200, 200), (self._screenWidth - 200, 510))
+                                    (200, 200), (self._screenWidth - 200, 520), True)
+                self.drawUltPlayer((self._screenWidth - 210, 520), (20, 170), self.indexDefender)
+
             elif self.matchService.getCurrentState() == states['waitingAnswer']:
                 self.drawQuestion()
                 self._drawInputBox()
 
                 if self._insertedText != '':
-                    print(self.validateAnswer())
-                    self._insertedText = ''
-                    self.questionReceived = None
+                    self.matchService.setCurrentState(states['attacking'])
+
             elif self.matchService.getCurrentState() == states['attacking']:
                 self.attack()
 
+            if self.matchService.gameFinished():
+                self._quit()
             self._event()
 
             pygame.display.update()
@@ -110,7 +114,7 @@ class MatchView(BaseView):
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
         self._drawCharacter(attacker, 'idle', fightersSize, (offSet, topGap))
-        self._drawCharacter(defender, 'idle', fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap))
+        self._drawCharacter(defender, 'idle', fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap), True)
 
     def setLevel(self, level):
         print(level)
@@ -124,15 +128,14 @@ class MatchView(BaseView):
             self.questionReceived = question.get_question(self.questionLevel)
         self._drawText(self.questionReceived.question, 14, self._mainFont, Colors.WHITE, (200, 50))
 
-    def validateAnswer(self):
-        self.matchService.setCurrentState(states['attacking'])
-        return self.questionReceived.validate_answer(self._insertedText)
+
 
     def attack(self):
         defenderPlayer = self.matchService.getPlayers()[self.indexDefender]
-        self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer)
+        self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived, self._insertedText)
         self.matchService.setCurrentState(states['selectingDefender'])
-
+        self._insertedText = ''
+        self.questionReceived = None
     def drawHPAllPlayers(self):
         x = 50
         barWidth = 200
@@ -163,11 +166,13 @@ class MatchView(BaseView):
         pygame.draw.rect(self._screen, Colors.GRAY, (cord[0], cord[1], size[0], size[1]))
         pygame.draw.rect(self._screen, Colors.RED, (cord[0], cord[1], currentBarWidth, size[1]))
 
-        text = f"{currentHp}/{maxHp}"
-        textSurface = pygame.font.Font(self._mainFont, 12).render(text, True, Colors.WHITE)
-        textWidth, text_height = textSurface.get_size()
 
-        textX = cord[0] + (size[0] - textWidth) // 2
-        textY = cord[1] + (size[1] - text_height) // 2
 
-        self._screen.blit(textSurface, (textX, textY))
+    def drawUltPlayer(self, cord, size, player):
+        maxUlt = 5
+        currentUlt = self.matchService.getPlayers()[player].getCharacter().getUlt()
+
+        currentBarWidth = int((currentUlt / maxUlt) * size[0])
+
+        pygame.draw.rect(self._screen, Colors.GRAY, (cord[0], cord[1], size[0], size[1]))
+        pygame.draw.rect(self._screen, Colors.YELLOW, (cord[0], cord[1], currentBarWidth, size[1]))
