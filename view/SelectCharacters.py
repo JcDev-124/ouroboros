@@ -11,11 +11,13 @@ class SelectCharacters(BaseView):
     indexPlayer = 0
     indexCharacter = 0
     indexesSprite = [0, 0, 0]
-    fontSize = 16
     characters = [CharacterDamage(), CharacterHealer(), CharacterTank()]
     selectedPositions = []
-    teste = CharacterHealer()
-    x = 250
+    fontSize = 16
+
+    maxStats = None
+
+    gameBarSize = None
 
     def __init__(self, matchService):
         self.matchService = matchService
@@ -68,17 +70,20 @@ class SelectCharacters(BaseView):
             raise ValueError(message)
 
     def run(self):
-        self._bg_frame_interval = 9
-        self._ch_frame_interval = 5
+        self._bg_frame_interval = 5
+        self._ch_frame_interval = 3
+        self.gameBarSize = (self._screenWidth, 230)
+        self.maxStats = self.getMaxStats()
         while self._running:
             clock = pygame.time.Clock()
 
             self._drawBackground('./assets/images/backgrounds/characterSelectionBackground.gif', (self._screenWidth, 490), (0, 0))
-            self._drawImage('./assets/images/ui/gameBar.png', (self._screenWidth, 230), (0, self._screenHeight - 230))
+            self._drawImage('./assets/images/ui/gameBar.png', (self._screenWidth, self.gameBarSize[1]), (0, self._screenHeight - self.gameBarSize[1]))
             self._drawImage('./assets/images/ui/transition.png', (self._screenWidth, 26),
-                            (0, self._screenHeight - (230 + 25)))
+                            (0, self._screenHeight - (self.gameBarSize[1] + 25)))
 
             if self.indexPlayer < len(self.matchService.getPlayers()):
+                self.drawCharacterStats()
                 self.drawCharacterOption(self.indexPlayer + 1)
             else:
                 self.drawStartMatchButton()
@@ -89,6 +94,88 @@ class SelectCharacters(BaseView):
 
             pygame.display.update()
             clock.tick(self._fps)
+
+    def getMaxStats(self):
+        maxStats = (0, 0, 0)
+        for stat in range(3):
+            for i, character in enumerate(self.characters):
+                if stat == 0:
+                    maxStats = (max(character.get_hp(), maxStats[stat]), maxStats[1], maxStats[2])
+                elif stat == 1:
+                    maxStats = (maxStats[0], max(character.getAttackMean(), maxStats[1]), maxStats[2])
+                elif stat == 2:
+                    maxStats = (maxStats[0], maxStats[1], max(character.getLuck(), maxStats[2]))
+
+        return maxStats
+
+    def drawCharacterStats(self):
+        # size
+        overlaySize = (350, 420)
+        offset = ((self._screenHeight - self.gameBarSize[1]) - overlaySize[1]) / 2
+        coordinates = (self._screenWidth - overlaySize[0] - offset, offset)
+        # character name and description
+        nameSize = 35
+        descriptionSize = 18
+        fontSpacingMultiplier = 0.85
+        topMargin = 20
+        sMargin = 20
+
+        # stats bar
+        barSizeMultiplier = 0.90
+        # do not change
+        barAspectRatio = 0.4278
+        barSize = (overlaySize[0] * barSizeMultiplier, overlaySize[0] * barSizeMultiplier * barAspectRatio)
+        barCoordinates = (coordinates[0] + (overlaySize[0] - barSize[0]) / 2,
+                          coordinates[1] + nameSize + (nameSize * fontSpacingMultiplier))
+
+        # do not change
+        fillSize = (barSize[0] * 0.905, barSize[1] * 0.209)
+        fillOffset = (barSize[0] * 0.0746, barSize[1] * 0.035)
+        fillGap = barSize[1] * 0.1164
+        fillCoordinates = (barCoordinates[0] + fillOffset[0], barCoordinates[1] + fillOffset[1])
+
+        # do not change
+        self._drawImage('./assets/images/ui/characterBackground.png', overlaySize, coordinates)
+        self._drawText(self.characters[self.indexCharacter].name, nameSize, './assets/fonts/titleFont.ttf',
+                       Colors.BLACK,
+                       (coordinates[0] + overlaySize[0] / 2, coordinates[1] + (nameSize * fontSpacingMultiplier)),
+                       (0, nameSize * 0.2))
+
+        # character stats
+        character = self.characters[self.indexCharacter]
+        hp = character.get_hp()
+        attack = character.getAttackMean()
+        luck = character.getLuck()
+
+        # fill stats bar
+        # hp
+        statsFill = (fillSize[0] * (hp / self.maxStats[0]))
+        pygame.draw.rect(self._screen, Colors.BG_BAR,
+                         (fillCoordinates[0], fillCoordinates[1], fillSize[0], fillSize[1]))
+        pygame.draw.rect(self._screen, Colors.HP_BAR, (fillCoordinates[0], fillCoordinates[1], statsFill, fillSize[1]))
+        fillCoordinates = (fillCoordinates[0], fillCoordinates[1] + fillSize[1] + fillGap)
+        # attack
+        statsFill = (fillSize[0] * (attack / self.maxStats[1]))
+        pygame.draw.rect(self._screen, Colors.BG_BAR,
+                         (fillCoordinates[0], fillCoordinates[1], fillSize[0], fillSize[1]))
+        pygame.draw.rect(self._screen, Colors.ATTACK_BAR,
+                         (fillCoordinates[0], fillCoordinates[1], statsFill, fillSize[1]))
+        fillCoordinates = (fillCoordinates[0], fillCoordinates[1] + fillSize[1] + fillGap)
+        # luck
+        statsFill = (fillSize[0] * (luck / self.maxStats[2]))
+        pygame.draw.rect(self._screen, Colors.BG_BAR,
+                         (fillCoordinates[0], fillCoordinates[1], fillSize[0], fillSize[1]))
+        pygame.draw.rect(self._screen, Colors.LUCK_BAR,
+                         (fillCoordinates[0], fillCoordinates[1], statsFill, fillSize[1]))
+
+        self._drawImage('./assets/images/ui/statsBar.png', barSize, barCoordinates)
+
+        # description
+        description = character.getDescription()
+        descriptionBoxSize = (overlaySize[0] - sMargin * 2, overlaySize[1] - barCoordinates[1] - barSize[1] - sMargin * 2)
+        descriptionCoordinates = (coordinates[0] + sMargin + descriptionBoxSize[0] / 2, barCoordinates[1] + barSize[1] + topMargin)
+        self._drawTextBox(description, descriptionSize, './assets/fonts/mainFont.ttf', Colors.BLACK,
+                          descriptionCoordinates, descriptionBoxSize)
 
     def drawCharacterOption(self, index):
         # change if needed
