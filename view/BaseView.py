@@ -84,6 +84,29 @@ class BaseView(ABC):
             textRectangle.center = coordinates
         self._screen.blit(textObj, textRectangle)
 
+    def _drawTextBox(self, text, size, fontDirectory, color, coordinates, boxSize):
+        font = pygame.font.Font(fontDirectory, size)
+        words = text.split(' ')
+        lines = []
+        currentLine = ""
+
+        for word in words:
+            testLine = f"{currentLine} {word}".strip()
+            if font.size(testLine)[0] <= boxSize[0]:
+                currentLine = testLine
+            else:
+                lines.append(currentLine)
+                currentLine = word
+
+        if currentLine:
+            lines.append(currentLine)
+
+        yOffset = coordinates[1]
+        for line in lines:
+            self._drawText(line, size, fontDirectory, color, (coordinates[0], yOffset))
+            yOffset += size + (size * 0.15)
+
+
     def _drawButton(self, text, fontDirectory, fontSize, fontColor, coordinates, size, image=None, action=None,
                     parameters=None):
         mouse = pygame.mouse.get_pos()
