@@ -148,25 +148,28 @@ class BaseView(ABC):
         pygame.display.set_caption(caption)
 
     def _drawInputBox(self):
+
         if self._input_active:
-            color = self._color_active
+            border_color = Colors.ATTACK_BAR
         else:
-            color = self._color_inactive
+            border_color = (64,58,44)
 
-        self._input_box.w = 250
-        self._input_box.h = 40
+        fill_color = Colors.BG_BAR
 
-        input_box_image = pygame.image.load('./assets/images/ui/questionBackground.png')
-        input_box_image = pygame.transform.scale(input_box_image, (self._input_box.w, self._input_box.h))
+        self._input_box.w = 150
+        self._input_box.h = 25
 
         input_box_x = (self._screenWidth - self._input_box.w) // 2
-        input_box_y = self._screenHeight - self._input_box.h - 30  # Ajuste de 20 pixels do fundo da tela
+        input_box_y = self._screenHeight - self._input_box.h - 60
 
         self._input_box.topleft = (input_box_x, input_box_y)
 
-        self._screen.blit(input_box_image, self._input_box.topleft)
+        pygame.draw.rect(self._screen, fill_color, self._input_box)
 
-        text_surface = pygame.font.Font(self._mainFont, 12).render(self._input_text, True, Colors.WHITE)
+        border_thickness = 3
+        pygame.draw.rect(self._screen, border_color, self._input_box, border_thickness)
+
+        text_surface = pygame.font.Font(self._mainFont, 14).render(self._input_text, True, Colors.WHITE)
         self._screen.blit(text_surface, (
             self._input_box.x + 5, self._input_box.y + (self._input_box.h - text_surface.get_height()) // 2))
 
