@@ -62,4 +62,5 @@ class CharacterHealer(Character):
             self.hp = self._maxHpValue
         else:
             self.hp += self._maxHpValue * 0.6
+        self.hp = int(self.hp)
         self.ult = 0
