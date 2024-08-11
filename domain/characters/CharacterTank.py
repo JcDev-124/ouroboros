@@ -28,26 +28,32 @@ class CharacterTank(Character):
         self.nameHeavyAttack = 'Avalanche Titânica'
         self.nameUltimateAttack = 'Cúpula'
 
+        self.lightAttack = 20
+        self.mediumAttack = 30
+        self.heavyAttack = 40
+
         self.shield = False
+
+        self.description = 'Atlas é o pilar da defesa, suportando os golpes mais poderosos com resiliência inquebrável. Em situações extremas, ele levanta a Barreira do Firmamento, bloqueando o próximo ataque.'
 
     def light_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(20 * intensity)
+        character._attack(self.lightAttack * intensity)
         self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(30 * intensity)
+        character._attack(self.mediumAttack * intensity)
         self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(40 * intensity)
+        character._attack(self.heavyAttack * intensity)
         self.addUltPoints(3)
         return
 

@@ -29,24 +29,30 @@ class CharacterDamage(Character):
         self.nameHeavyAttack = '13º Trabalho'
         self.nameUltimateAttack = 'Ira de Zeus'
 
+        self.lightAttack = 30
+        self.mediumAttack = 45
+        self.heavyAttack = 60
+
+        self.description = 'Herácles é o gigante da batalha, esmagando tudo em seu caminho com força devastadora. Quando a fúria atinge seu auge, ele libera a Ira de Zeus, dobrando o dano e obliterando seus adversários.'
+
     def light_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(30 * intensity)
+        character._attack(self.lightAttack * intensity)
         self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(45 * intensity)
+        character._attack(self.mediumAttack * intensity)
         self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(60 * intensity)
+        character._attack(self.heavyAttack * intensity)
         self.addUltPoints(3)
         return
 
@@ -54,5 +60,5 @@ class CharacterDamage(Character):
         if not self.verify_ult():
             raise ValueError("Ultimate não disponível")
 
-        character._attack((120) * intensity)
+        character._attack((self.heavyAttack * 2) * intensity)
         self.ult = 0

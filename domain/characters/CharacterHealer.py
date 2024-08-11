@@ -28,24 +28,30 @@ class CharacterHealer(Character):
         self.nameHeavyAttack = 'Lash'
         self.nameUltimateAttack = 'Milagre de Epidauro'
 
+        self.lightAttack = 10
+        self.mediumAttack = 20
+        self.heavyAttack = 30
+
+        self.description = 'Asclépio combina sabedoria e precisão, capaz de ferir e curar com igual habilidade. Em momentos críticos, ele invoca o Milagre de Epidauro, restaurando sua vitalidade.'
+
     def light_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(10 * intensity)
+        character._attack(self.lightAttack * intensity)
         self.addUltPoints(1)
         return
 
     def medium_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(20 * intensity)
+        character._attack(self.mediumAttack * intensity)
         self.addUltPoints(2)
         return
 
     def heavy_attack(self, intensity, character):
         if self.hasLuck():
             intensity = intensity * 2
-        character._attack(30 * intensity)
+        character._attack(self.heavyAttack * intensity)
         self.addUltPoints(3)
         return
 

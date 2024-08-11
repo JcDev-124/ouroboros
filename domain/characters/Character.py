@@ -32,6 +32,12 @@ class Character(ABC):
         self.current_frame = 0
         self.current_action = 'idle'
 
+        self.lightAttack = 0
+        self.mediumAttack = 0
+        self.heavyAttack = 0
+
+        self.description = ''
+
     def _attack(self, dmg):
         self.hp -= dmg
         if self.hp < 0:
@@ -99,3 +105,12 @@ class Character(ABC):
             return None
 
         return sheet
+
+    def getAttackMean(self):
+        return (self.lightAttack + self.mediumAttack + self.heavyAttack) / 3
+
+    def getLuck(self):
+        return self.luck
+
+    def getDescription(self):
+        return self.description
