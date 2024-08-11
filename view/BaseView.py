@@ -163,7 +163,7 @@ class BaseView(ABC):
             self._pygame_images_char[key] = None
 
         if self._frame_counter % self._ch_frame_interval == 0:
-            frame = character.getNextSprite(action)
+            frame = character.getNextSprite()
             frame = frame.convert_alpha()
             self._pygame_images_char[key] = frame
 

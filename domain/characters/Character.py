@@ -17,6 +17,7 @@ class Character(ABC):
             'attack': None,
             'take_hit': None,
             'death': None,
+            'ultimate': None,
             'profile': None
         }
 
@@ -24,6 +25,7 @@ class Character(ABC):
             'idle': 0,
             'attack': 0,
             'take_hit': 0,
+            'ultimate': 0,
             'death': 0
         }
 
@@ -32,6 +34,8 @@ class Character(ABC):
 
     def _attack(self, dmg):
         self.hp -= dmg
+        if self.hp < 0:
+            self.hp = 0
         return
 
     def verify_ult(self):
@@ -62,14 +66,12 @@ class Character(ABC):
         chance = random.randint(0, 100)
         return chance <= self.luck
 
-    def getNextSprite(self, action):
-        if action == 'profile':
-            return None
-
-        if action != self.current_action:
-            self.current_action = action
+    def changeState(self, new_action):
+        if new_action in self.sprites:
+            self.current_action = new_action
             self.current_frame = 0
 
+    def getNextSprite(self):
         sheet = self.sprites[self.current_action]
         num_frames = self.frame_counts[self.current_action]
 
@@ -77,13 +79,16 @@ class Character(ABC):
         frame_height = sheet.get_height()
 
         frame_surface = pygame.Surface((frame_width, frame_height), pygame.SRCALPHA)
-
         frame_surface.blit(sheet, (0, 0), (self.current_frame * frame_width, 0, frame_width, frame_height))
 
         self.current_frame += 1
 
         if self.current_frame >= num_frames:
-            self.current_frame = 0
+            if self.current_action != 'death':
+                self.current_action = 'idle'
+                self.current_frame = 0
+            else:
+                self.current_frame -= 1
 
         return frame_surface
 

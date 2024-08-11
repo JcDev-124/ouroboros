@@ -9,23 +9,25 @@ class CharacterDamage(Character):
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/damage/idle.png'),
-            'attack': pygame.image.load(f'./assets/images/characters/damage/attack1.png'),
+            'attack': pygame.image.load(f'./assets/images/characters/damage/attack.png'),
             'take_hit': pygame.image.load(f'./assets/images/characters/damage/take_hit.png'),
             'death': pygame.image.load(f'./assets/images/characters/damage/death.png'),
+            'ultimate': pygame.image.load(f'./assets/images/characters/damage/ultimate.png'),
             'profile': pygame.image.load(f'./assets/images/characters/damage/profile.png')
         }
 
         self.frame_counts = {
             'idle': 10,
-            'attack': 7,
+            'attack': 6,
             'take_hit': 3,
+            'ultimate': 9,
             'death': 11
         }
 
-        self.nameLightAttack = "attack 1 - dano"
-        self.nameMediumAttack = "attack 2 - dano"
-        self.nameHeavyAttack = "attack 3 - dano"
-        self.nameUltimateAttack = "attack 4 - dano"
+        self.nameLightAttack = 'Golpe de Leão'
+        self.nameMediumAttack = 'Martelo de Hefesto'
+        self.nameHeavyAttack = '13º Trabalho'
+        self.nameUltimateAttack = 'Ira de Zeus'
 
     def light_attack(self, intensity, character):
         if self.hasLuck():

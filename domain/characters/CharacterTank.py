@@ -1,7 +1,6 @@
 import pygame
 from domain.characters.Character import Character
 
-
 class CharacterTank(Character):
 
     def __init__(self):
@@ -9,9 +8,10 @@ class CharacterTank(Character):
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/tank/idle.png'),
-            'attack': pygame.image.load(f'./assets/images/characters/tank/attack1.png'),
+            'attack': pygame.image.load(f'./assets/images/characters/tank/attack.png'),
             'take_hit': pygame.image.load(f'./assets/images/characters/tank/take_hit.png'),
             'death': pygame.image.load(f'./assets/images/characters/tank/death.png'),
+            'ultimate': pygame.image.load(f'./assets/images/characters/tank/ultimate.png'),
             'profile': pygame.image.load(f'./assets/images/characters/tank/profile.png')
         }
 
@@ -19,15 +19,16 @@ class CharacterTank(Character):
             'idle': 11,
             'attack': 7,
             'take_hit': 4,
+            'ultimate': 7,
             'death': 11
         }
 
-        self.nameLightAttack = "attack 1 - tank"
-        self.nameMediumAttack = "attack 2 - tank"
-        self.nameHeavyAttack = "attack 3 - tank"
-        self.nameUltimateAttack = "attack 4 - tank"
+        self.nameLightAttack = 'Muralha de Titã'
+        self.nameMediumAttack = 'Apoio do Céu'
+        self.nameHeavyAttack = 'Avalanche Titânica'
+        self.nameUltimateAttack = 'Cúpula'
 
-        self.shield = True
+        self.shield = False
 
     def light_attack(self, intensity, character):
         if self.hasLuck():

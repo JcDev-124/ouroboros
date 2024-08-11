@@ -37,29 +37,32 @@ class MatchService:
 
         self.attacker = random.choice(self.players)
 
-    def validateAnswer(self, question, answer, damage, defender, punish, typeAttack):
+    def validateAnswer(self, question, answer, damage, defender, punish, typeAttack, ultimate=False):
         if question.validate_answer(answer):
-            typeAttack(damage, defender.getCharacter())
+            if not isinstance(self.players[self.getAttackerIndex()].getCharacter(), CharacterDamage) and ultimate:
+                typeAttack()
+            else:
+                typeAttack(damage, defender.getCharacter())
         else:
             self.attacker.getCharacter().punish(punish)
 
     def attack(self, level, damage, defender, question, answer):
         try:
             if level == 'light':
-                self.validateAnswer(question, answer, damage, defender, 5, self.attacker.getCharacter().light_attack)
+                self.validateAnswer(question, answer, damage, defender, 3, self.attacker.getCharacter().light_attack)
             elif level == 'medium':
-                self.validateAnswer(question, answer, damage, defender, 3, self.attacker.getCharacter().medium_attack)
+                self.validateAnswer(question, answer, damage, defender, 2, self.attacker.getCharacter().medium_attack)
             elif level == 'heavy':
-                self.validateAnswer(question, answer, damage, defender, 2, self.attacker.getCharacter().heavy_attack)
+                self.validateAnswer(question, answer, damage, defender, 1, self.attacker.getCharacter().heavy_attack)
             elif level == 'ultimate':
-                if type(self.attacker.getCharacter()) is CharacterDamage:
-                    self.attacker.getCharacter().ult_attack(damage, defender.getCharacter())
-                else:
-                    self.attacker.getCharacter().ult_attack()
+                self.validateAnswer(question, answer, damage, defender, 5,
+                                        self.attacker.getCharacter().ult_attack, True)
             else:
                 raise ValueError("Invalid attack type.")
-            self.__eliminatePlayer()
-            self.__setNextAttacker()
+            willEliminate = self.__willEliminate()
+            if not willEliminate:
+                self.__setNextAttacker()
+            return willEliminate
         except ValueError as e:
             print(e)
 
@@ -87,10 +90,16 @@ class MatchService:
         else:
             self.attacker = self.players[currentAttackerIndex + 1]
 
-    def __eliminatePlayer(self):
+    def __willEliminate(self):
         for player in self.players:
             if player.getCharacter().get_hp() <= 0:
-                self.players.remove(player)
+                return True
+
+        return False
+
+    def eliminatePlayer(self, player):
+        self.players.remove(player)
+        self.__setNextAttacker()
 
     def gameFinished(self):
         return len(self.players) == 1

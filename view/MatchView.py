@@ -1,5 +1,6 @@
 import pygame
 
+from domain.characters.CharacterDamage import CharacterDamage
 from domain.questions.Questions import Questions
 from service.MatchService import states
 from view.BaseView import BaseView
@@ -16,6 +17,10 @@ class MatchView(BaseView):
     # design constants
     gameBarSize = None
     characterBgSize = None
+
+    waitingState = 60
+    deathCycle = False
+    temporaryDefender = None
 
     # game constants
     attackIntensity = 5
@@ -69,7 +74,7 @@ class MatchView(BaseView):
             elif self.matchService.getCurrentState() == states['attacking']:
                 self.attack()
 
-            if self.matchService.gameFinished():
+            if self.matchService.gameFinished() and not self.deathCycle:
                 self._quit()
 
             self._event()
@@ -164,7 +169,7 @@ class MatchView(BaseView):
             self._drawImage('./assets/images/ui/hpBar.png', imageSize, coordinates)
 
     def drawAttackOptions(self):
-        fontSize = 14
+        fontSize = 22
         buttonSize = (340, 80)
         gap = 10
         buttonImage = './assets/images/ui/button.png'
@@ -222,12 +227,11 @@ class MatchView(BaseView):
 
         attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
         defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
-        self._drawCharacter(attacker, 'idle', fightersSize, (offSet, topGap))
+        self._drawCharacter(attacker, attacker.current_action, fightersSize, (offSet, topGap))
         if self.matchService.getCurrentState() != states['selectingDefender']:
-            self._drawCharacter(defender, 'idle', fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap), True)
+            self._drawCharacter(defender, defender.current_action, fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap), True)
 
     def setLevel(self, level):
-        print(level)
         self.questionLevel = level[0]
         self.attackLevel = level[1]
         self.matchService.setCurrentState(states['waitingAnswer'])
@@ -240,10 +244,39 @@ class MatchView(BaseView):
 
     def attack(self):
         defenderPlayer = self.matchService.getPlayers()[self.indexDefender]
-        self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived, self._insertedText)
-        self.matchService.setCurrentState(states['selectingDefender'])
-        self._insertedText = ''
-        self.questionReceived = None
+        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        if self.waitingState == 60 and not self.deathCycle:
+            if self.attackLevel != 'ultimate':
+                attacker.changeState('attack')
+            else:
+                attacker.changeState('ultimate')
+                self.waitingState = self._ch_frame_interval * attacker.frame_counts['ultimate']
+
+        defender = defenderPlayer.getCharacter()
+        if self.waitingState == 60 / (defender.frame_counts['take_hit']) and not self.deathCycle:
+            if isinstance(attacker, CharacterDamage) or self.attackLevel != 'ultimate':
+                defender.changeState('take_hit')
+
+        if self.deathCycle:
+            self.deathCycle = False
+            self.matchService.eliminatePlayer(defenderPlayer)
+            return None
+
+        if self.waitingState > 0:
+            self.waitingState -= 1
+            return None
+
+        if self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived, self._insertedText):
+            defenderPlayer.getCharacter().changeState('death')
+            self.waitingState = 60
+            self.deathCycle = True
+
+        if not self.deathCycle:
+            self.matchService.setCurrentState(states['selectingDefender'])
+            self._insertedText = ''
+            self.questionReceived = None
+            self.waitingState = 60
+
     def drawHPAllPlayers(self):
         x = 50
         barWidth = 200
@@ -264,26 +297,3 @@ class MatchView(BaseView):
                            (965 + barWidth, x + 10))
 
             x += barHeight + 10
-
-    def drawHpPlayer(self, cord, size, player):
-        character = self.matchService.getPlayers()[player].getCharacter()
-        maxHp = character._maxHpValue
-        currentHp = character.hp
-
-        currentBarHeight = int((currentHp / maxHp) * size[1])
-
-        pygame.draw.rect(self._screen, Colors.GRAY, (cord[0], cord[1], size[0], size[1]))
-
-        pygame.draw.rect(self._screen, Colors.RED,
-                         (cord[0], cord[1] + (size[1] - currentBarHeight), size[0], currentBarHeight))
-
-    def drawUltPlayer(self, cord, size, player):
-        maxUlt = 5
-        currentUlt = self.matchService.getPlayers()[player].getCharacter().getUlt()
-
-        currentBarHeight = int((currentUlt / maxUlt) * size[1])
-
-        pygame.draw.rect(self._screen, Colors.GRAY, (cord[0], cord[1], size[0], size[1]))
-
-        pygame.draw.rect(self._screen, Colors.YELLOW,
-                         (cord[0], cord[1] + (size[1] - currentBarHeight), size[0], currentBarHeight))

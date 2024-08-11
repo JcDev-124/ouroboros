@@ -8,9 +8,10 @@ class CharacterHealer(Character):
 
         self.sprites = {
             'idle': pygame.image.load(f'./assets/images/characters/healer/idle.png'),
-            'attack': pygame.image.load(f'./assets/images/characters/healer/attack1.png'),
+            'attack': pygame.image.load(f'./assets/images/characters/healer/attack.png'),
             'take_hit': pygame.image.load(f'./assets/images/characters/healer/take_hit.png'),
             'death': pygame.image.load(f'./assets/images/characters/healer/death.png'),
+            'ultimate': pygame.image.load(f'./assets/images/characters/healer/ultimate.png'),
             'profile': pygame.image.load(f'./assets/images/characters/healer/profile.png')
         }
 
@@ -18,13 +19,14 @@ class CharacterHealer(Character):
             'idle': 10,
             'attack': 13,
             'take_hit': 3,
+            'ultimate': 8,
             'death': 18
         }
 
-        self.nameLightAttack = "attack 1 - healer"
-        self.nameMediumAttack = "attack 2 - healer"
-        self.nameHeavyAttack = "attack 3 - healer"
-        self.nameUltimateAttack = "attack 4 - healer"
+        self.nameLightAttack = 'Toque de Serpente'
+        self.nameMediumAttack = 'Incisão'
+        self.nameHeavyAttack = 'Lash'
+        self.nameUltimateAttack = 'Milagre de Epidauro'
 
     def light_attack(self, intensity, character):
         if self.hasLuck():
