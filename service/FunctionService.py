@@ -66,6 +66,24 @@ class FunctionService:
         else:
             return FunctionService.modulus(FunctionService.subtraction(x, y), y)
 
+    def max(self, x, y):
+        if FunctionService.subtraction(x, y) >= 0:
+            return x
+        else:
+            return y
+
+    def min(self, x, y):
+        if FunctionService.subtraction(x, y) <= 0:
+            return x
+        else:
+            return y
+
+    def equal(self, x, y):
+        return FunctionService.subtraction(x, y) == 0
+
+    def different(self, x, y):
+        return FunctionService.subtraction(x,y) != 0
+
     @staticmethod
     def __next(x):
         return (x + 1)
