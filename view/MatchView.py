@@ -103,7 +103,7 @@ class MatchView(BaseView):
             self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, imageCoordinates)
             defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
             coordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset + chOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
-            self._screen.blit(pygame.transform.scale(defender.getProfileImage(), miniatureSize), coordinates)
+            self._screen.blit(pygame.transform.flip(pygame.transform.scale(defender.getProfileImage(), miniatureSize), 1, 0), coordinates)
             self._drawText(str(self.indexDefender + 1), 25, './assets/fonts/titleFont.ttf',
                            Colors.BLACK, imageCoordinates, (20, 20))
 
