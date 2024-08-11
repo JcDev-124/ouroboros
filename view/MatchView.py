@@ -244,40 +244,17 @@ class MatchView(BaseView):
             self.questionReceived = question.get_question(self.questionLevel)
 
         image = "./assets/images/ui/questionBackground.png"
-        imageSize = (400, 200)
+        imageSize = (550, 200)
         imageCord = ((self._screenWidth - imageSize[0]) // 2, (self._screenHeight - imageSize[1]) - 15)
 
         self._drawImage(image, imageSize, imageCord)
 
-        textSize = 24
-        font = pygame.font.SysFont(None, textSize)
+        textSize = 16
+        font_path = './assets/fonts/mainFont.ttf'
 
         text = self.questionReceived.question
-        text_color = Colors.WHITE
-
-        words = text.split(' ')
-        lines = []
-        current_line = ''
-
-        for word in words:
-            test_line = f"{current_line} {word}".strip()
-            test_surface = font.render(test_line, True, text_color)
-            if test_surface.get_width() > imageSize[0] - 20:
-                lines.append(current_line)
-                current_line = word
-            else:
-                current_line = test_line
-
-        if current_line:
-            lines.append(current_line)
-
-        y = imageCord[1] + (imageSize[1] - len(lines) * (textSize + 5)) // 2
-
-        for line in lines:
-            text_surface = font.render(line, True, text_color)
-            text_rect = text_surface.get_rect(center=(self._screenWidth // 2, y))
-            self._screen.blit(text_surface, text_rect)
-            y += textSize + 5
+        cord = (self._screenWidth // 2, -40 + imageCord[1] + imageSize[1] // 2)
+        self._drawTextBox(text, textSize, font_path, Colors.WHITE, cord, (imageSize[0] * 0.88, imageSize[1] * 0.88))
 
     def attack(self):
         defenderPlayer = self.matchService.getPlayer(self.indexDefender)
