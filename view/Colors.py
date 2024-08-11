@@ -1,6 +1,8 @@
 class Colors:
     HP_BAR = (207, 12, 22)
     ULT_BAR = (230, 216, 30)
+    LUCK_BAR = (12, 153, 52)
+    ATTACK_BAR = (26, 66, 125)
     BG_BAR = (55, 55, 55)
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
