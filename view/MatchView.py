@@ -1,6 +1,7 @@
 import pygame
 
 from domain.characters.CharacterDamage import CharacterDamage
+from domain.characters.CharacterTank import CharacterTank
 from domain.questions.Questions import Questions
 from service.MatchService import states
 from view.BaseView import BaseView
@@ -52,12 +53,11 @@ class MatchView(BaseView):
 
             self.drawPlayersMiniature()
             self.drawPlayersStats()
+            # stats overlay
+            self.drawPlayersOverlay()
 
             # fighters
             self.drawFighters()
-
-            # stats overlay
-            self.drawHPAllPlayers()
 
             # options
             if self.matchService.getCurrentState() == states['selectingDefender']:
@@ -82,6 +82,51 @@ class MatchView(BaseView):
             pygame.display.update()
             clock.tick(self._fps)
 
+    def drawPlayersOverlay(self):
+        offset = -20
+        barSize = (218, 26)
+        miniatureSize = (barSize[1], barSize[1])
+        numPlayers = len(self.matchService.getPlayers())
+        XGap = 8
+        YGap = 5
+        correction = barSize[1] * 0.5
+        markerSize = 3
+
+        size = (barSize[0] + miniatureSize[0] + (XGap * 3), (barSize[1] * numPlayers) + (YGap * numPlayers + 1) + correction)
+        position = (self._screenWidth - size[0] + offset, (offset * -1))
+        miniaturePosition = (position[0] + XGap, position[1] + YGap + correction / 2)
+        barPosition = (miniaturePosition[0] + XGap + miniatureSize[0], miniaturePosition[1])
+        fillSize = (barSize[0] * 0.955, barSize[1] * 0.695)
+        fillPosition = (barPosition[0] + barSize[0] * 0.0248, barPosition[1] + barSize[1] * 0.16)
+        print(barPosition)
+        print(fillPosition)
+        self._drawImage('./assets/images/ui/overlay.png', size, position)
+        for i, player in enumerate(self.matchService.getPlayers()):
+            character = player.getCharacter()
+            hp = character.get_hp()
+            maxHp = character._maxHpValue
+            pygame.draw.rect(self._screen, Colors.BG_BAR,
+                             (fillPosition[0], fillPosition[1], fillSize[0], fillSize[1]))
+            pygame.draw.rect(self._screen, Colors.HP_BAR,
+                             (fillPosition[0], fillPosition[1], (fillSize[0] * (hp / maxHp)), fillSize[1]))
+            self._screen.blit(pygame.transform.scale(character.getProfileImage(), miniatureSize), miniaturePosition)
+            self._drawImage('./assets/images/ui/emptyBar.png', barSize, barPosition)
+            if i == self.matchService.getAttackerIndex():
+                self.drawMarker(Colors.LUCK_BAR, (miniaturePosition[0] + markerSize, miniaturePosition[1] + markerSize), markerSize, True)
+            elif i == self.indexDefender:
+                self.drawMarker(Colors.HP_BAR, (miniaturePosition[0] + markerSize, miniaturePosition[1] + markerSize), markerSize, True)
+            else:
+                self.drawMarker(Colors.ATTACK_BAR, (miniaturePosition[0] + markerSize, miniaturePosition[1] + markerSize), markerSize, True)
+
+            miniaturePosition = (miniaturePosition[0], miniaturePosition[1] + YGap + miniatureSize[1])
+            barPosition = (barPosition[0], barPosition[1] + YGap + barSize[1])
+            fillPosition = (fillPosition[0], fillPosition[1] + YGap + barSize[1])
+
+    def drawMarker(self, color, position, size, outline=False):
+        if outline:
+            pygame.draw.circle(self._screen, Colors.BLACK, (position[0], position[1]), size + 2)
+        pygame.draw.circle(self._screen, color, position, size)
+
     def drawPlayersMiniature(self):
         # fixed values
         bgOffset = (self.gameBarSize[1] - self.characterBgSize[1]) / 2
@@ -89,12 +134,13 @@ class MatchView(BaseView):
         miniatureSize = (self.characterBgSize[0] - (chOffset * 2), self.characterBgSize[1] - (chOffset * 2))
 
         # attacker
-        players = self.matchService.getPlayers()
         imageCoordinates = (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1]))
         self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, imageCoordinates)
         attacker = self.matchService.getPlayer(self.matchService.getAttackerIndex()).getCharacter()
         coordinates = (chOffset + bgOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
         self._screen.blit(pygame.transform.scale(attacker.getProfileImage(), miniatureSize), coordinates)
+        if isinstance(attacker, CharacterTank) and attacker.verify_ult():
+            self._drawImage('./assets/images/characters/tank/shield.png', (24, 24), (coordinates[0] + miniatureSize[0] - 30, coordinates[1]))
         self._drawText(str(self.matchService.getAttackerIndex() + 1), 25, './assets/fonts/titleFont.ttf', Colors.BLACK, imageCoordinates, (20, 20))
 
         # defender
@@ -104,6 +150,9 @@ class MatchView(BaseView):
             defender = self.matchService.getPlayer(self.indexDefender).getCharacter()
             coordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset + chOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
             self._screen.blit(pygame.transform.flip(pygame.transform.scale(defender.getProfileImage(), miniatureSize), 1, 0), coordinates)
+            if isinstance(defender, CharacterTank) and defender.verify_ult():
+                self._drawImage('./assets/images/characters/tank/shield.png', (24, 24),
+                                (coordinates[0] + miniatureSize[0] - 30, coordinates[1]))
             self._drawText(str(self.indexDefender + 1), 25, './assets/fonts/titleFont.ttf',
                            Colors.BLACK, imageCoordinates, (20, 20))
 
@@ -290,27 +339,6 @@ class MatchView(BaseView):
             self._insertedText = ''
             self.questionReceived = None
             self.waitingState = 60
-
-    def drawHPAllPlayers(self):
-        x = 50
-        barWidth = 200
-        barHeight = 20
-
-        for idx, player in enumerate(self.matchService.getPlayers()):
-            character = player.getCharacter()
-            maxHp = character._maxHpValue
-            currentHp = character.hp
-
-            currentBarWidth = int((currentHp / maxHp) * barWidth)
-
-            pygame.draw.rect(self._screen, Colors.GRAY, (900, x, barWidth, barHeight))
-
-            pygame.draw.rect(self._screen, Colors.RED, (900, x, currentBarWidth, barHeight))
-
-            self._drawText(f"{idx + 1}: {currentHp}/{maxHp}", 14, self._mainFont, Colors.WHITE,
-                           (965 + barWidth, x + 10))
-
-            x += barHeight + 10
 
     def drawEndGame(self):
         ko_image_path = './assets/images/ui/KO.png'

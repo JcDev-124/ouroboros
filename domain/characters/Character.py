@@ -45,7 +45,7 @@ class Character(ABC):
         return
 
     def verify_ult(self):
-        return self.ult > 3
+        return self.ult == 5
 
     def getUlt(self):
         return self.ult
