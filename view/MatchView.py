@@ -75,7 +75,7 @@ class MatchView(BaseView):
                 self.attack()
 
             if self.matchService.gameFinished() and not self.deathCycle:
-                self._quit()
+                self.drawEndGame()
 
             self._event()
 
@@ -92,7 +92,7 @@ class MatchView(BaseView):
         players = self.matchService.getPlayers()
         imageCoordinates = (bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1]))
         self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, imageCoordinates)
-        attacker = players[self.matchService.getAttackerIndex()].getCharacter()
+        attacker = self.matchService.getPlayer(self.matchService.getAttackerIndex()).getCharacter()
         coordinates = (chOffset + bgOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
         self._screen.blit(pygame.transform.scale(attacker.getProfileImage(), miniatureSize), coordinates)
         self._drawText(str(self.matchService.getAttackerIndex() + 1), 25, './assets/fonts/titleFont.ttf', Colors.BLACK, imageCoordinates, (20, 20))
@@ -101,7 +101,7 @@ class MatchView(BaseView):
         if self.matchService.getCurrentState() == states['selectingAttack']:
             imageCoordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset, bgOffset + (self._screenHeight - self.gameBarSize[1]))
             self._drawImage('./assets/images/ui/characterBackground.png', self.characterBgSize, imageCoordinates)
-            defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
+            defender = self.matchService.getPlayer(self.indexDefender).getCharacter()
             coordinates = (self._screenWidth - self.characterBgSize[0] - bgOffset + chOffset, chOffset + bgOffset + (self._screenHeight - self.gameBarSize[1]))
             self._screen.blit(pygame.transform.flip(pygame.transform.scale(defender.getProfileImage(), miniatureSize), 1, 0), coordinates)
             self._drawText(str(self.indexDefender + 1), 25, './assets/fonts/titleFont.ttf',
@@ -118,7 +118,7 @@ class MatchView(BaseView):
 
         # attacker
         # ult
-        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        attacker = self.matchService.getPlayer(self.matchService.getAttackerIndex()).getCharacter()
         maxUlt = 5
         currentUlt = attacker.getUlt()
         currentBarHeight = int((currentUlt / maxUlt) * barSize[1])
@@ -143,7 +143,7 @@ class MatchView(BaseView):
         # defender
         if self.matchService.getCurrentState() == states['selectingAttack']:
             # ult
-            defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
+            defender = self.matchService.getPlayer(self.indexDefender).getCharacter()
             maxUlt = 5
             currentUlt = defender.getUlt()
             currentBarHeight = int((currentUlt / maxUlt) * barSize[1])
@@ -179,7 +179,7 @@ class MatchView(BaseView):
 
         position = ((self._screenWidth - totalWidth) / 2, ((self._screenHeight - self.gameBarSize[1]) + (self.gameBarSize[1] - totalHeight) / 2))
 
-        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        attacker = self.matchService.getPlayer(self.matchService.getAttackerIndex()).getCharacter()
         self._drawButton(attacker.nameLightAttack, self._mainFont, fontSize, Colors.BLACK, position, buttonSize, buttonImage, self.setLevel, ('easy', 'light'))
         position = (position[0] + buttonSize[0] + gap, position[1])
         self._drawButton(attacker.nameMediumAttack, self._mainFont, fontSize, Colors.BLACK,position, buttonSize, buttonImage, self.setLevel,('normal', 'medium'))
@@ -225,10 +225,10 @@ class MatchView(BaseView):
         offSet = -120
         topGap = 0
 
-        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
-        defender = self.matchService.getPlayers()[self.indexDefender].getCharacter()
+        attacker = self.matchService.attacker.getCharacter()
+        defender = self.matchService.getPlayer(self.indexDefender).getCharacter()
         self._drawCharacter(attacker, attacker.current_action, fightersSize, (offSet, topGap))
-        if self.matchService.getCurrentState() != states['selectingDefender']:
+        if self.matchService.getCurrentState() != states['selectingDefender'] and len(self.matchService.players) > 1:
             self._drawCharacter(defender, defender.current_action, fightersSize, (self._screenWidth - fightersSize[0] + (-1 * offSet), topGap), True)
 
     def setLevel(self, level):
@@ -236,15 +236,52 @@ class MatchView(BaseView):
         self.attackLevel = level[1]
         self.matchService.setCurrentState(states['waitingAnswer'])
 
+    import pygame
+
     def drawQuestion(self):
         if not self.questionReceived:
             question = Questions()
             self.questionReceived = question.get_question(self.questionLevel)
-        self._drawText(self.questionReceived.question, 14, self._mainFont, Colors.WHITE, (200, 50))
+
+        image = "./assets/images/ui/questionBackground.png"
+        imageSize = (400, 200)
+        imageCord = ((self._screenWidth - imageSize[0]) // 2, (self._screenHeight - imageSize[1]) - 15)
+
+        self._drawImage(image, imageSize, imageCord)
+
+        textSize = 24
+        font = pygame.font.SysFont(None, textSize)
+
+        text = self.questionReceived.question
+        text_color = Colors.WHITE
+
+        words = text.split(' ')
+        lines = []
+        current_line = ''
+
+        for word in words:
+            test_line = f"{current_line} {word}".strip()
+            test_surface = font.render(test_line, True, text_color)
+            if test_surface.get_width() > imageSize[0] - 20:
+                lines.append(current_line)
+                current_line = word
+            else:
+                current_line = test_line
+
+        if current_line:
+            lines.append(current_line)
+
+        y = imageCord[1] + (imageSize[1] - len(lines) * (textSize + 5)) // 2
+
+        for line in lines:
+            text_surface = font.render(line, True, text_color)
+            text_rect = text_surface.get_rect(center=(self._screenWidth // 2, y))
+            self._screen.blit(text_surface, text_rect)
+            y += textSize + 5
 
     def attack(self):
-        defenderPlayer = self.matchService.getPlayers()[self.indexDefender]
-        attacker = self.matchService.getPlayers()[self.matchService.getAttackerIndex()].getCharacter()
+        defenderPlayer = self.matchService.getPlayer(self.indexDefender)
+        attacker = self.matchService.getPlayer(self.matchService.getAttackerIndex()).getCharacter()
         if self.waitingState == 60 and not self.deathCycle:
             if self.attackLevel != 'ultimate':
                 attacker.changeState('attack')
@@ -257,13 +294,13 @@ class MatchView(BaseView):
             if isinstance(attacker, CharacterDamage) or self.attackLevel != 'ultimate':
                 defender.changeState('take_hit')
 
+        if self.waitingState > 0:
+            self.waitingState -= 1
+            return None
+
         if self.deathCycle:
             self.deathCycle = False
             self.matchService.eliminatePlayer(defenderPlayer)
-            return None
-
-        if self.waitingState > 0:
-            self.waitingState -= 1
             return None
 
         if self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived, self._insertedText):
@@ -297,3 +334,27 @@ class MatchView(BaseView):
                            (965 + barWidth, x + 10))
 
             x += barHeight + 10
+
+    def drawEndGame(self):
+        ko_image_path = './assets/images/ui/KO.png'
+        imageSize = (400, 200)
+        imagePosition = ( (self._screenWidth - imageSize[0]) // 2, (self._screenHeight - imageSize[1]) // 2)
+        self._drawImage(ko_image_path, imageSize, imagePosition)
+
+
+        buttonSize = (150, 50)
+        gap = 10
+        buttonImage = './assets/images/ui/button.png'
+
+        totalWidth = (buttonSize[0] * 2) + gap
+        buttonPosition = ((self._screenWidth - totalWidth) / 2, self._screenHeight // 2 + 150)
+
+        self._drawButton("Sair", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage,
+                         self._quit)
+
+        buttonPosition = (buttonPosition[0] + buttonSize[0] + gap, buttonPosition[1])
+
+        self._drawButton("Menu", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage)
+
+
+
