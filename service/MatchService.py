@@ -104,6 +104,8 @@ class MatchService:
             pass
         else:
             self.attacker = self.players[currentAttackerIndex + 1]
+        print(self.players)
+        print(self.attacker)
 
 
 

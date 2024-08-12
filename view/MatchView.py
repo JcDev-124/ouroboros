@@ -72,11 +72,13 @@ class MatchView(BaseView):
             # options
             current_state = self.matchService.getCurrentState()
             if current_state == states['selectingDefender']:
+                self.timerRunning = False
                 self.drawDefenderOptions()
             elif current_state == states['selectingAttack']:
                 self.drawAttackOptions()
             elif current_state == states['waitingAnswer']:
-                self.startTimer()
+                if not self.timerRunning:
+                    self.startTimer()  # Iniciar o cronômetro se não estiver em execução
                 if self.timerRunning:
                     self.updateTimer()
                 self.drawQuestion()
@@ -391,8 +393,7 @@ class MatchView(BaseView):
             elapsedTime = pygame.time.get_ticks() - self.timeStartTime
             if elapsedTime >= self.timerDuration * 1000:
                 self.timerRunning = False
-                self.matchService.setCurrentState(states['selectingDefender'])
-                self.matchService.attacker = self.indexDefender
+
             else:
                 remainingTime = self.timerDuration - (elapsedTime / 1000)
                 self.drawTimer(remainingTime)
@@ -404,7 +405,28 @@ class MatchView(BaseView):
         timerRect = timerSurface .get_rect(center=(self._screenWidth / 2, 50))
         self._screen.blit(timerSurface , timerRect)
 
-    def newGame(self):
-        import subprocess
-        subprocess.run(["python","main.py"])
-        self._quit()
+    def startTimer(self):
+        self.timeStartTime = pygame.time.get_ticks()
+        self.timerRunning = True
+        self.timeUpCallback = self.timerUp
+
+    def updateTimer(self):
+        if self.timerRunning:
+            elapsedTime = (pygame.time.get_ticks() - self.timeStartTime) / 1000
+            remainingTime = self.timerDuration - elapsedTime
+
+            if remainingTime <= 0:
+                self.timerRunning = False
+                remainingTime = 0
+                if self.timeUpCallback:
+                    self.timeUpCallback()
+
+
+            self.drawTimer(remainingTime)
+
+
+
+    def timerUp(self):
+        self.matchService.setCurrentState(states['selectingDefender'])
+        self.matchService.attacker = self.matchService.getPlayer(self.indexDefender)
+        self.timerRunning = False
