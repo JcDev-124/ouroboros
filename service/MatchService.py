@@ -104,10 +104,6 @@ class MatchService:
             pass
         else:
             self.attacker = self.players[currentAttackerIndex + 1]
-        print(self.players)
-        print(self.attacker)
-
-
 
     def __willEliminate(self):
         for player in self.players:
@@ -117,6 +113,8 @@ class MatchService:
         return False
 
     def eliminatePlayer(self, player):
+        if player.getCharacter().get_hp() > 0:
+            return None
         self.players.remove(player)
         self.__setNextAttacker()
 

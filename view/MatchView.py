@@ -21,7 +21,7 @@ class MatchView(BaseView):
 
     waitingState = 60
     deathCycle = False
-    temporaryDefender = None
+    playerToEliminate = None
 
     # game constants
     attackIntensity = 5
@@ -78,7 +78,7 @@ class MatchView(BaseView):
                 self.drawAttackOptions()
             elif current_state == states['waitingAnswer']:
                 if not self.timerRunning:
-                    self.startTimer()  # Iniciar o cronômetro se não estiver em execução
+                    self.startTimer()
                 if self.timerRunning:
                     self.updateTimer()
                 self.drawQuestion()
@@ -340,7 +340,11 @@ class MatchView(BaseView):
 
         if self.deathCycle:
             self.deathCycle = False
-            self.matchService.eliminatePlayer(defenderPlayer)
+            self.matchService.eliminatePlayer(self.playerToEliminate)
+            self.matchService.setCurrentState(states['selectingDefender'])
+            self._insertedText = ''
+            self.questionReceived = None
+            self.waitingState = 60
             return None
 
         isCorrect = self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived,
@@ -351,6 +355,7 @@ class MatchView(BaseView):
         if isCorrect == 'false':
             self.audio_manager.play_sound_effect('wrong')
         if isCorrect == 'death':
+            self.playerToEliminate = defenderPlayer
             defenderPlayer.getCharacter().changeState('death')
             self.waitingState = 60
             self.deathCycle = True
