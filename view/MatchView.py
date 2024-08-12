@@ -375,14 +375,13 @@ class MatchView(BaseView):
         buttonImage = './assets/images/ui/button.png'
 
         totalWidth = (buttonSize[0] * 2) + gap
-        buttonPosition = ((self._screenWidth - totalWidth) / 2, self._screenHeight // 2 + 150)
+        buttonPosition = ((self._screenWidth - buttonSize[0]) / 2, self._screenHeight // 2 + 150)
 
         self._drawButton("Sair", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage,
                          self._quit)
 
-        buttonPosition = (buttonPosition[0] + buttonSize[0] + gap, buttonPosition[1])
 
-        self._drawButton("Menu", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage, self.newGame)
+
 
     def startTimer(self):
         if not self.timerRunning or pygame.time.get_ticks() - self.timeStartTime >= self.timerDuration * 1000:
