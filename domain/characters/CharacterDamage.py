@@ -33,7 +33,7 @@ class CharacterDamage(Character):
         self.mediumAttack = 45
         self.heavyAttack = 60
 
-        self.description = 'Herácles é o gigante da batalha, esmagando tudo em seu caminho com força devastadora. Quando a fúria atinge seu auge, ele libera a Ira de Zeus, dobrando o dano e obliterando seus adversários.'
+        self.description = 'Hercules é o gigante da batalha, esmagando tudo em seu caminho com força devastadora. Quando a fúria atinge seu auge, ele libera a Ira de Zeus, dobrando o dano e obliterando seus adversários.'
 
     def light_attack(self, intensity, character):
         if self.hasLuck():

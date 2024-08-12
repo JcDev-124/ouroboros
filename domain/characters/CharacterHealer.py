@@ -32,7 +32,7 @@ class CharacterHealer(Character):
         self.mediumAttack = 20
         self.heavyAttack = 30
 
-        self.description = 'Asclépio combina sabedoria e precisão, capaz de ferir e curar com igual habilidade. Em momentos críticos, ele invoca o Milagre de Epidauro, restaurando sua vitalidade.'
+        self.description = 'Asclepio combina sabedoria e precisão, capaz de ferir e curar com igual habilidade. Em momentos críticos, ele invoca o Milagre de Epidauro, restaurando sua vitalidade.'
 
     def light_attack(self, intensity, character):
         if self.hasLuck():
