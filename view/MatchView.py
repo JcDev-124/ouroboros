@@ -341,6 +341,11 @@ class MatchView(BaseView):
         if self.deathCycle:
             self.deathCycle = False
             self.matchService.eliminatePlayer(self.playerToEliminate)
+            if len(self.matchService.getPlayers()) == 2:
+                if self.matchService.getAttackerIndex() == 0:
+                    self.selectedDefender(1)
+                else:
+                    self.selectedDefender(0)
             self.matchService.setCurrentState(states['selectingDefender'])
             self._insertedText = ''
             self.questionReceived = None
