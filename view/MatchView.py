@@ -26,6 +26,8 @@ class MatchView(BaseView):
     # game constants
     attackIntensity = 5
 
+    koPlayed = False
+
     def __init__(self, matchService):
         self.matchService = matchService
         self.matchService.startMatch()
@@ -35,6 +37,10 @@ class MatchView(BaseView):
         self._bg_frame_interval = 3
         self._ch_frame_interval = 3
         self.audio_manager.play_background_music('./assets/sounds/fight.ogg')
+
+        self.audio_manager.load_sound_effect('correct', './assets/sounds/correct.mp3')
+        self.audio_manager.load_sound_effect('wrong', './assets/sounds/wrong.mp3')
+        self.audio_manager.load_sound_effect('ko', './assets/sounds/ko.mp3')
 
         # design constants
         self.gameBarSize = (self._screenWidth, 230)
@@ -329,7 +335,14 @@ class MatchView(BaseView):
             self.matchService.eliminatePlayer(defenderPlayer)
             return None
 
-        if self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived, self._insertedText):
+        isCorrect = self.matchService.attack(self.attackLevel, self.attackIntensity, defenderPlayer, self.questionReceived,
+                                 self._insertedText)
+
+        if isCorrect == 'true':
+            self.audio_manager.play_sound_effect('correct')
+        if isCorrect == 'false':
+            self.audio_manager.play_sound_effect('wrong')
+        if isCorrect == 'death':
             defenderPlayer.getCharacter().changeState('death')
             self.waitingState = 60
             self.deathCycle = True
@@ -342,10 +355,12 @@ class MatchView(BaseView):
 
     def drawEndGame(self):
         ko_image_path = './assets/images/ui/KO.png'
-        imageSize = (400, 200)
+        imageSize = (500, 237)
         imagePosition = ( (self._screenWidth - imageSize[0]) // 2, (self._screenHeight - imageSize[1]) // 2)
         self._drawImage(ko_image_path, imageSize, imagePosition)
-
+        if not self.koPlayed:
+            self.audio_manager.play_sound_effect('ko')
+            self.koPlayed = True
 
         buttonSize = (150, 50)
         gap = 10
@@ -357,9 +372,6 @@ class MatchView(BaseView):
         self._drawButton("Sair", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage,
                          self._quit)
 
-        buttonPosition = (buttonPosition[0] + buttonSize[0] + gap, buttonPosition[1])
+        #buttonPosition = (buttonPosition[0] + buttonSize[0] + gap, buttonPosition[1])
 
-        self._drawButton("Menu", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage)
-
-
-
+        #self._drawButton("Menu", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage)

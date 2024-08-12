@@ -1,10 +1,15 @@
+import sys
+
 import pygame
 
 from domain.player.Player import Player
 from service.MatchService import MatchService
 from view.BaseView import BaseView
 from view.Colors import Colors
-from view.SelectCharacters import SelectCharacters
+
+modulename = 'MatchView'
+if modulename not in sys.modules:
+    from view.SelectCharacters import SelectCharacters
 
 class MenuView(BaseView):
 

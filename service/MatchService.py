@@ -44,30 +44,32 @@ class MatchService:
                 typeAttack()
             else:
                 typeAttack(damage, defender.getCharacter())
+            return 'true'
         else:
             self.attacker.getCharacter().punish(punish)
+            return 'false'
 
     def attack(self, level, damage, defender, question, answer):
         try:
             if level == 'light':
-                self.validateAnswer(question, answer, damage, defender, 3, self.attacker.getCharacter().light_attack)
+                isCorrect = self.validateAnswer(question, answer, damage, defender, 3, self.attacker.getCharacter().light_attack)
             elif level == 'medium':
-                self.validateAnswer(question, answer, damage, defender, 2, self.attacker.getCharacter().medium_attack)
+                isCorrect = self.validateAnswer(question, answer, damage, defender, 2, self.attacker.getCharacter().medium_attack)
             elif level == 'heavy':
-                self.validateAnswer(question, answer, damage, defender, 1, self.attacker.getCharacter().heavy_attack)
+                isCorrect = self.validateAnswer(question, answer, damage, defender, 1, self.attacker.getCharacter().heavy_attack)
             elif level == 'ultimate':
-                self.validateAnswer(question, answer, damage, defender, 5,
+                isCorrect = self.validateAnswer(question, answer, damage, defender, 5,
                                         self.attacker.getCharacter().ult_attack, True)
             else:
                 raise ValueError("Invalid attack type.")
             willEliminate = self.__willEliminate()
             if not willEliminate:
                 self.__setNextAttacker()
-            return willEliminate
+            else:
+                isCorrect = 'death'
+            return isCorrect
         except ValueError as e:
             print(e)
-
-        self.attacker = defender
 
     def getPlayers(self):
         return self.players
