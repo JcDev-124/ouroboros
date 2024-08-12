@@ -141,13 +141,13 @@ class Questions:
             ),
             Question(
                 question="Qual o resultado de percentual(15, 60)?",
-                function="modulus",
+                function="percentage",
                 values=(15, 60),
                 answer=9
             ),
             Question(
                 question="Qual o resultado de percentual(25, 36)?",
-                function="modulus",
+                function="percentage",
                 values=(25, 36),
                 answer=9
             ),
@@ -351,24 +351,24 @@ class Questions:
                 answer=17
             ),Question(
                 question="Qual o resultado de percentual(30, 120)?",
-                function="modulus",
+                function="percentage",
                 values=(30, 120),
                 answer=36
             ),
             Question(
                 question="Qual o resultado de percentual(60, 150)?",
-                function="modulus",
+                function="percentage",
                 values=(60, 150),
                 answer=90
             ),Question(
                 question="Qual o resultado de percentual(40, 210)?",
-                function="modulus",
+                function="percentage",
                 values=(40, 210),
                 answer=84
             ),
             Question(
                 question="Qual o resultado de percentual(60, 160)?",
-                function="modulus",
+                function="percentage",
                 values=(60, 160),
                 answer=96
             ),Question(
@@ -403,19 +403,19 @@ class Questions:
                 answer=22
             ),Question(
                 question="Qual o resultado de percentual(15, 60)?",
-                function="modulus",
+                function="percentage",
                 values=(15, 60),
                 answer=9
             ),
             Question(
                 question="Qual o resultado de percentual(30, 120)?",
-                function="modulus",
+                function="percentage",
                 values=(30, 120),
                 answer=36
             ),
             Question(
                 question="Qual o resultado de percentual(40, 160)?",
-                function="modulus",
+                function="percentage",
                 values=(40, 160),
                 answer=64
             ),
