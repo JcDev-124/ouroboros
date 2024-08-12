@@ -46,6 +46,10 @@ class MatchView(BaseView):
         self.gameBarSize = (self._screenWidth, 230)
         self.characterBgSize = (200, 200)
 
+        self.timeStartTime = None
+        self.timerDuration = 20
+        self.timerRunning = False
+
         while self._running:
             clock = pygame.time.Clock()
 
@@ -66,18 +70,22 @@ class MatchView(BaseView):
             self.drawFighters()
 
             # options
-            if self.matchService.getCurrentState() == states['selectingDefender']:
+            current_state = self.matchService.getCurrentState()
+            if current_state == states['selectingDefender']:
                 self.drawDefenderOptions()
-            elif self.matchService.getCurrentState() == states['selectingAttack']:
+            elif current_state == states['selectingAttack']:
                 self.drawAttackOptions()
-            elif self.matchService.getCurrentState() == states['waitingAnswer']:
+            elif current_state == states['waitingAnswer']:
+                self.startTimer()
+                if self.timerRunning:
+                    self.updateTimer()
                 self.drawQuestion()
                 self._drawInputBox()
 
                 if self._insertedText != '':
                     self.matchService.setCurrentState(states['attacking'])
 
-            elif self.matchService.getCurrentState() == states['attacking']:
+            elif current_state == states['attacking']:
                 self.attack()
 
             if self.matchService.gameFinished() and not self.deathCycle:
@@ -104,8 +112,6 @@ class MatchView(BaseView):
         barPosition = (miniaturePosition[0] + XGap + miniatureSize[0], miniaturePosition[1])
         fillSize = (barSize[0] * 0.955, barSize[1] * 0.695)
         fillPosition = (barPosition[0] + barSize[0] * 0.0248, barPosition[1] + barSize[1] * 0.16)
-        print(barPosition)
-        print(fillPosition)
         self._drawImage('./assets/images/ui/overlay.png', size, position)
         for i, player in enumerate(self.matchService.getPlayers()):
             character = player.getCharacter()
@@ -372,6 +378,33 @@ class MatchView(BaseView):
         self._drawButton("Sair", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage,
                          self._quit)
 
-        #buttonPosition = (buttonPosition[0] + buttonSize[0] + gap, buttonPosition[1])
+        buttonPosition = (buttonPosition[0] + buttonSize[0] + gap, buttonPosition[1])
 
-        #self._drawButton("Menu", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage)
+        self._drawButton("Menu", self._mainFont, 20, Colors.BLACK, buttonPosition, buttonSize, buttonImage, self.newGame)
+
+    def startTimer(self):
+        if not self.timerRunning or pygame.time.get_ticks() - self.timeStartTime >= self.timerDuration * 1000:
+            self.timeStartTime = pygame.time.get_ticks()
+            self.timerRunning = True
+    def updateTimer(self):
+        if self.timerRunning:
+            elapsedTime = pygame.time.get_ticks() - self.timeStartTime
+            if elapsedTime >= self.timerDuration * 1000:
+                self.timerRunning = False
+                self.matchService.setCurrentState(states['selectingDefender'])
+                self.matchService.attacker = self.indexDefender
+            else:
+                remainingTime = self.timerDuration - (elapsedTime / 1000)
+                self.drawTimer(remainingTime)
+
+    def drawTimer(self, remaining_time):
+        font = pygame.font.Font('./assets/fonts/mainFont.ttf', 48)
+        timerText = f"{int(remaining_time)}"
+        timerSurface = font.render(timerText, True, Colors.WHITE)
+        timerRect = timerSurface .get_rect(center=(self._screenWidth / 2, 50))
+        self._screen.blit(timerSurface , timerRect)
+
+    def newGame(self):
+        import subprocess
+        subprocess.run(["python","main.py"])
+        self._quit()
